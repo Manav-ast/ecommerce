@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id(); // Auto-incrementing primary key
             $table->string('name', 100);
             $table->string('email', 100)->unique();
-            $table->number_format('phone_no', 10)->unique();
+            $table->string('phone_no', 10)->unique();
             $table->string('password', 255);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps(); // Includes created_at and updated_at (default columns)

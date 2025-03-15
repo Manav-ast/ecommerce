@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             "email" =>  "manav@gmail.com",
             "password"  =>  Hash::make("Test@1234"),
             "status"    =>  "active",
+            "phone_no" => "1234567890",
         ]);
 
         Roles::create([

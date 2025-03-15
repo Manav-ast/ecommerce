@@ -39,7 +39,7 @@ class RedirectIfAuthenticated
      */
     protected function redirectTo(Request $request, $guards): ?string
     {
-        if(in_array("customer", $guards)) {
+        if(in_array("user", $guards)) {
             return route("homepage");
         } else if( in_array("admin", $guards)) {
             return route("admin.dashboard");
