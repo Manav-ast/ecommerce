@@ -49,6 +49,14 @@
                         <span class="ml-4">Users</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.roles.index') }}" 
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
+                        {{ request()->is('Roles') ? 'bg-blue-500 text-white' : '' }}">
+                        <i class="uil uil-user-circle text-lg"></i>
+                        <span class="ml-4">Roles</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

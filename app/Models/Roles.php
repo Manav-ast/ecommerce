@@ -14,4 +14,9 @@ class Roles extends Model
         "role_name",
         "description",
     ];
+
+    public function admins()
+    {
+        return $this->hasMany(Admin::class, 'role_id');
+    }
 }

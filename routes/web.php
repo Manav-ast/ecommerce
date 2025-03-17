@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
@@ -40,14 +41,14 @@ Route::prefix("admin")->group(function () {
         Route::post('category/store', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
         Route::get('category/edit/{id}', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
         Route::put('categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
-        Route::get('/admin/categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
+        Route::get('categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
         Route::delete('categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
     });
 });
 
 
 Route::prefix('admin/products')->group(function () {
-    Route::middleware("auth:admin")->group(function (){
+    Route::middleware("auth:admin")->group(function () {
         Route::get('/', [AdminProductController::class, 'index'])->name('admin.products');
         Route::get('/create', [AdminProductController::class, 'create'])->name('admin.products.create');
         Route::post('/store', [AdminProductController::class, 'store'])->name('admin.products.store');
@@ -59,7 +60,7 @@ Route::prefix('admin/products')->group(function () {
 });
 
 Route::prefix('admin/users')->group(function () {
-    Route::middleware("auth:admin")->group(function (){
+    Route::middleware("auth:admin")->group(function () {
         Route::get('/', [AdminUserController::class, 'index'])->name('admin.users');
         Route::get('/create', [AdminUserController::class, 'create'])->name('admin.users.create');
         Route::post('/store', [AdminUserController::class, 'store'])->name('admin.users.store');
@@ -67,5 +68,18 @@ Route::prefix('admin/users')->group(function () {
         Route::put('/update/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
         Route::delete('/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
         Route::get('/search', [AdminUserController::class, 'search'])->name('admin.users.search');
+    });
+});
+
+
+Route::prefix('admin')->group(function () {
+    Route::middleware("auth:admin")->group(function () {
+        Route::get('/roles', [AdminRoleController::class, 'index'])->name('admin.roles.index');
+        Route::get('/roles/create', [AdminRoleController::class, 'create'])->name('admin.roles.create');
+        Route::post('/roles/store', [AdminRoleController::class, 'store'])->name('admin.roles.store');
+        Route::get('/roles/edit/{id}', [AdminRoleController::class, 'edit'])->name('admin.roles.edit');
+        Route::put('/roles/update/{id}', [AdminRoleController::class, 'update'])->name('admin.roles.update');
+        Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('admin.roles.destroy');
+        Route::get('/roles/search', [AdminRoleController::class, 'search'])->name('admin.roles.search');
     });
 });
