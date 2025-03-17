@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomepageController;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("guest:user")->group(function () {
@@ -39,7 +41,7 @@ Route::prefix("admin")->group(function () {
         Route::get('category/edit/{id}', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
         Route::put('categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
         Route::get('/admin/categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
-        Route::delete('categories/{id}', [AdminCategoryController::class, 'delete'])->name('admin.categories.delete');
+        Route::delete('categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
     });
 });
 
@@ -51,7 +53,19 @@ Route::prefix('admin/products')->group(function () {
         Route::post('/store', [AdminProductController::class, 'store'])->name('admin.products.store');
         Route::get('/edit/{id}', [AdminProductController::class, 'edit'])->name('admin.products.edit');
         Route::put('/update/{id}', [AdminProductController::class, 'update'])->name('admin.products.update');
-        Route::delete('/{id}', [AdminProductController::class, 'delete'])->name('admin.products.delete');
+        Route::delete('/{id}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::get('/search', [AdminProductController::class, 'search'])->name('admin.products.search');
+    });
+});
+
+Route::prefix('admin/users')->group(function () {
+    Route::middleware("auth:admin")->group(function (){
+        Route::get('/', [AdminUserController::class, 'index'])->name('admin.users');
+        Route::get('/create', [AdminUserController::class, 'create'])->name('admin.users.create');
+        Route::post('/store', [AdminUserController::class, 'store'])->name('admin.users.store');
+        Route::get('/edit/{id}', [AdminUserController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/update/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::get('/search', [AdminUserController::class, 'search'])->name('admin.users.search');
     });
 });

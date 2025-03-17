@@ -85,15 +85,22 @@
 
     <!-- JavaScript for Search & Delete Confirmation Modal -->
     <script>
-        $(document).ready(function () {
-            $("#searchInput").on("keyup", function () {
-                let query = $(this).val();
+        $(document).ready(function() {
+            $("#searchInput").on("keyup", function() {
+                let query = $(this).val().trim(); // Remove extra spaces
+
                 $.ajax({
                     url: "{{ route('admin.categories.search') }}",
                     type: "GET",
-                    data: { search: query },
-                    success: function (data) {
-                        $("#categoryTable").html(data);
+                    data: {
+                        q: query
+                    }, // ✅ Use `q` instead of `search`
+                    dataType: "json", // ✅ Expect JSON response
+                    success: function(data) {
+                        $("#categoryTable").html(data.html); // ✅ Inject new table content
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Search Error:", error);
                     }
                 });
             });

@@ -40,7 +40,7 @@
                         <i class="uil uil-box text-lg"></i>
                         <span class="ml-4">Orders</span>
                     </a>
-                </li>
+                </li> --}}
                 <li>
                     <a href="{{ route('admin.users') }}" 
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
@@ -48,7 +48,7 @@
                         <i class="uil uil-users-alt text-lg"></i>
                         <span class="ml-4">Users</span>
                     </a>
-                </li> --}}
+                </li>
             </ul>
         </nav>
     </div>
