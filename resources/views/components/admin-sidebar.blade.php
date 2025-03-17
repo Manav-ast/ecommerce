@@ -25,7 +25,7 @@
                         <span class="ml-4">Category</span>
                     </a>
                 </li>
-                {{-- <li>
+                <li>
                     <a href="{{ route('admin.products') }}" 
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
                         {{ request()->is('Products') ? 'bg-blue-500 text-white' : '' }}">
@@ -33,7 +33,7 @@
                         <span class="ml-4">Products</span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="{{ route('admin.orders') }}" 
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
                         {{ request()->is('Orders') ? 'bg-blue-500 text-white' : '' }}">

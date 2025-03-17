@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\LoginController;
@@ -39,8 +40,18 @@ Route::prefix("admin")->group(function () {
         Route::put('categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
         Route::get('/admin/categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
         Route::delete('categories/{id}', [AdminCategoryController::class, 'delete'])->name('admin.categories.delete');
+    });
+});
 
-        //Admin Products Routes
-        
+
+Route::prefix('admin/products')->group(function () {
+    Route::middleware("auth:admin")->group(function (){
+        Route::get('/', [AdminProductController::class, 'index'])->name('admin.products');
+        Route::get('/create', [AdminProductController::class, 'create'])->name('admin.products.create');
+        Route::post('/store', [AdminProductController::class, 'store'])->name('admin.products.store');
+        Route::get('/edit/{id}', [AdminProductController::class, 'edit'])->name('admin.products.edit');
+        Route::put('/update/{id}', [AdminProductController::class, 'update'])->name('admin.products.update');
+        Route::delete('/{id}', [AdminProductController::class, 'delete'])->name('admin.products.delete');
+        Route::get('/search', [AdminProductController::class, 'search'])->name('admin.products.search');
     });
 });

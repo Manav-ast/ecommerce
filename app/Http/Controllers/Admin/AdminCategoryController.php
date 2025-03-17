@@ -136,4 +136,12 @@ class AdminCategoryController extends Controller
             return response()->json($output);
         }
     }
+
+    public function destroy(Category $category)
+    {
+        $category->products()->detach(); // Removes relations from pivot table
+        $category->delete();
+
+        return redirect()->route('admin.categories')->with('success', 'Category deleted successfully.');
+    }
 }
