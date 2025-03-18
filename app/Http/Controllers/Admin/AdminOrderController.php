@@ -1,0 +1,148 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+
+class AdminOrderController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $orders = Order::latest()->paginate(10);
+        return view('admin.orders.index', compact('orders'));
+    }
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+
+    public function search(Request $request)
+    {
+        try {
+            if ($request->ajax()) {
+                $query = $request->q;
+
+                $orders = Order::where('id', 'LIKE', "%{$query}%")
+                    ->orWhereHas('user', function ($q) use ($query) {
+                        $q->where('name', 'LIKE', "%{$query}%");
+                    })
+                    ->with('user')
+                    ->get();
+
+                $output = '';
+                if ($orders->isNotEmpty()) {
+                    foreach ($orders as $order) {
+                        $statusClass = match ($order->order_status) {
+                            'pending' => 'bg-yellow-500',
+                            'shipped' => 'bg-blue-500',
+                            'delivered' => 'bg-green-500',
+                            default => 'bg-red-500',
+                        };
+
+                        $output .= '
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                        <td class="px-6 py-3 text-gray-800">' . $order->id . '</td>
+                        <td class="px-6 py-3 text-gray-800">' . e(optional($order->user)->name ?? 'Guest') . '</td>
+                        <td class="px-6 py-3">
+                            <span class="px-2 py-1 rounded-lg text-white ' . $statusClass . '">
+                                ' . ucfirst($order->order_status) . '
+                            </span>
+                        </td>
+                        <td class="px-6 py-3 text-gray-600">$' . number_format($order->total_price, 2) . '</td>
+                        <td class="px-6 py-3 text-gray-600">' . date('d M, Y', strtotime($order->order_date)) . '</td>
+                        <td class="px-6 py-3 flex space-x-4">
+                            <a href="' . route('admin.orders.edit', $order->id) . '" class="text-blue-500 hover:text-blue-700 transition">
+                                <i class="uil uil-edit"></i>
+                            </a>
+                            <button type="button" onclick="openDeleteModal(' . $order->id . ', \'Order #' . $order->id . '\')"
+                                class="text-red-500 hover:text-red-700 transition">
+                                <i class="uil uil-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>';
+                    }
+                } else {
+                    $output = '<tr><td colspan="6" class="text-center py-3 text-gray-600">No orders found</td></tr>';
+                }
+
+                return response()->json(['html' => $output]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Error searching orders: " . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong while searching orders.'], 500);
+        }
+    }
+
+    public function details($id)
+    {
+        try {
+            // Fetch order with related data
+            $order = Order::with(['orderItems.product', 'payment', 'user.addresses'])->find($id);
+
+            if (!$order) {
+                return response()->json(['error' => 'Order not found.'], 404);
+            }
+
+            // Debugging: Check what data is returned
+            Log::info("Order Details: ", $order->toArray());
+
+            // Render the partial view
+            $html = view('admin.orders.partials.order_details', compact('order'))->render();
+
+            return response()->json(['html' => $html]);
+        } catch (\Exception $e) {
+            Log::error("Error fetching order details: " . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong while fetching order details.'], 500);
+        }
+    }
+}

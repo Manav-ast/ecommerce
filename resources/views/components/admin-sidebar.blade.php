@@ -33,14 +33,14 @@
                         <span class="ml-4">Products</span>
                     </a>
                 </li>
-                {{-- <li>
+                <li>
                     <a href="{{ route('admin.orders') }}" 
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
                         {{ request()->is('Orders') ? 'bg-blue-500 text-white' : '' }}">
                         <i class="uil uil-box text-lg"></i>
                         <span class="ml-4">Orders</span>
                     </a>
-                </li> --}}
+                </li>
                 <li>
                     <a href="{{ route('admin.users') }}" 
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 

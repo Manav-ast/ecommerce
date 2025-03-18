@@ -13,7 +13,7 @@ class LoginController extends Controller
     // Show login page
     public function index() {
         try {
-            return view("auth.user.login");
+            return view("pages.auth.login");
         } catch (Exception $e) {
             return back()->with('error', 'Something went wrong while loading the login page.');
         }

@@ -36,5 +36,12 @@ class DatabaseSeeder extends Seeder
             "password"  =>  Hash::make("Admin@1234"),
             "role_id" => 1,
         ]);
+
+        // $this->call([
+        //     OrderSeeder::class,
+        //     OrderItemSeeder::class,
+        //     PaymentSeeder::class,
+        //     AddressSeeder::class,
+        // ]);
     }
 }

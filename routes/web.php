@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\CategoryController;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +24,8 @@ Route::middleware("guest:user")->group(function () {
 Route::middleware("auth:user")->group(function () {
     Route::get("logout", [LoginController::class, "logout"])->name("user.logout");
     Route::get("/", [HomepageController::class, "index"])->name("homepage");
+    Route::get('/navbar', [CategoryController::class, 'index']);
+    Route::get('/', [CategoryController::class, 'index'])->name('home');
 });
 
 Route::prefix("admin")->group(function () {
@@ -56,6 +60,20 @@ Route::prefix('admin/products')->group(function () {
         Route::put('/update/{id}', [AdminProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/{id}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::get('/search', [AdminProductController::class, 'search'])->name('admin.products.search');
+    });
+});
+
+//Admin Order Routes
+Route::prefix('admin/orders')->group(function () {
+    Route::middleware("auth:admin")->group(function () {
+        Route::get('/', [AdminOrderController::class, 'index'])->name('admin.orders');
+        Route::get('/create', [AdminOrderController::class, 'create'])->name('admin.orders.create');
+        Route::post('/store', [AdminOrderController::class, 'store'])->name('admin.orders.store');
+        Route::get('/edit/{id}', [AdminOrderController::class, 'edit'])->name('admin.orders.edit');
+        Route::put('/update/{id}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
+        Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
+        Route::get('/search', [AdminOrderController::class, 'search'])->name('admin.orders.search');
+        Route::get('/details/{id}', [AdminOrderController::class, 'details'])->name('admin.orders.details');
     });
 });
 
