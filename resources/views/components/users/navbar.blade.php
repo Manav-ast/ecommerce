@@ -9,7 +9,7 @@
 
             <!-- Dropdown -->
             <div
-                class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
+                class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible z-10">
                 @foreach ($categories as $category)
                     <a href="{{ url('/category/' . $category->slug) }}"
                         class="flex items-center px-6 py-3 hover:bg-blue-100 transition">
@@ -25,7 +25,7 @@
         <div class="flex items-center justify-between flex-grow md:pl-12 py-5">
             <div class="flex items-center space-x-6 capitalize">
                 <a href="/" class="text-white hover:text-blue-200 transition">Home</a>
-                <a href="/shop" class="text-white hover:text-blue-200 transition">Shop</a>
+                <a href="{{ route('shop.index') }}" class="text-white hover:text-blue-200 transition">Shop</a>
                 <a href="/contact" class="text-white hover:text-blue-200 transition">Contact Us</a>
             </div>
 

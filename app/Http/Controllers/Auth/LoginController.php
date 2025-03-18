@@ -37,7 +37,7 @@ class LoginController extends Controller
                 }
 
                 $request->session()->regenerate();
-                return redirect(route("homepage"));
+                return redirect(route("home"));
             }
 
             return back()->withErrors([

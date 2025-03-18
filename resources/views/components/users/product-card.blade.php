@@ -1,40 +1,52 @@
 @props(['product'])
-<div class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-2xl">
-    <!-- Image Section -->
-    <div class="relative">
-        <a href="{{ url('products/' . $product['id']) }}">
-            <img src="{{ asset($product['image']) }}" alt="{{ $product['name'] }}" class="w-full h-56 object-cover transition-transform duration-300 hover:scale-105">
-        </a>
-    </div>
 
-    <!-- Content Section -->
-    <div class="p-5 flex-grow relative">
-        <!-- Wishlist Icon -->
-        <button class="wishlist-btn absolute top-2 right-2 text-gray-500 text-lg w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 hover:text-red-500 transition-all duration-200">
-            <i class="fa-solid fa-heart"></i>
-        </button>
-        <h4 class="uppercase font-semibold text-lg mb-3 text-gray-800 tracking-wide line-clamp-1 hover:text-primary transition-colors duration-200">
-            {{ $product['name'] }}
-        </h4>
-        <div class="flex items-baseline mb-4 space-x-3">
-            <p class="text-2xl text-primary font-bold">${{ $product['price'] }}</p>
-            @if (isset($product['old_price']))
-                <p class="text-sm text-gray-400 line-through">${{ $product['old_price'] }}</p>
-            @endif
-        </div>
-        <div class="flex items-center mb-4">
-            <div class="flex gap-1 text-sm text-yellow-400">
-                @for ($i = 0; $i < 5; $i++)
-                    <span><i class="fa-solid fa-star"></i></span>
-                @endfor
+<div
+    class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-2xl">
+    <!-- Clickable Wrapper -->
+    <a href="{{ route('shop.show', $product->slug) }}" class="flex flex-col flex-grow">
+        <!-- Image Section -->
+        <div class="relative group">
+            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105">
+            <!-- Overlay on Hover -->
+            <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-all duration-300">
             </div>
-            <div class="text-xs text-gray-500 ml-2 font-light">({{ $product['reviews'] }})</div>
         </div>
-    </div>
 
-    <!-- Footer Section -->
-    <div class="px-5 pb-5">
-        <button class="bg-primary border border-primary text-white px-8 py-3 font-medium rounded-lg uppercase flex items-center justify-center gap-2 hover:bg-transparent hover:text-primary transition-all duration-200 w-full" onclick="addToCart({{ $product['id'] }})">
+        <!-- Content Section -->
+        <div class="p-6 flex-grow relative">
+            <h4
+                class="uppercase font-semibold text-lg mb-1 text-gray-800 tracking-wide hover:text-blue-500 transition-colors duration-200">
+                {{ $product->name }}
+            </h4>
+
+            <!-- Category Display -->
+            @if ($product->categories->count())
+                <p class="text-sm text-gray-500 mb-3">
+                    {{-- Category: --}}
+                    @foreach ($product->categories as $category)
+                        <span class="bg-gray-200 text-gray-700 px-3 py-1 text-sm mr-1.5 rounded-full">
+                            {{ $category->name }}
+                        </span>
+                    @endforeach
+                </p>
+            @endif
+
+            <!-- Price -->
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-2xl text-blue-500 font-bold">${{ number_format($product->price, 2) }}</p>
+                @if ($product->old_price)
+                    <p class="text-sm text-gray-400 line-through">${{ number_format($product->old_price, 2) }}</p>
+                @endif
+            </div>
+        </div>
+    </a>
+
+    <!-- Footer Section (Add to Cart button remains outside the clickable area) -->
+    <div class="px-6 pb-6">
+        <button
+            class="bg-blue-500 border border-blue-500 text-white px-8 py-3 font-medium rounded-full uppercase flex items-center justify-center gap-2 hover:bg-transparent hover:text-blue-700 transition-all duration-300 w-full "
+            onclick="event.stopPropagation(); addToCart({{ $product->id }})">
             <i class="fa-solid fa-bag-shopping"></i> Add to Cart
         </button>
     </div>

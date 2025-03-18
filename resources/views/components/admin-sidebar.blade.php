@@ -1,8 +1,10 @@
 <aside class="w-64 bg-white shadow-lg min-h-screen flex flex-col justify-between p-4">
     <!-- Sidebar Header -->
     <div>
-        <div class="pb-4 border-b">
-            <h2 class="text-2xl font-bold text-gray-800 text-center">Admin Panel</h2>
+        <div class="pb-4 border-b text-center pl-2">
+            <a href="{{ route('admin.dashboard') }}" class="flex-shrink-0" >
+                <img src="{{ asset('assets/images/logo.svg') }}" alt="Company Logo" class="w-28 h-auto" loading="lazy">
+            </a>
         </div>
 
         <!-- Sidebar Navigation -->

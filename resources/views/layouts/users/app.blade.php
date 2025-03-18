@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,15 +17,21 @@
 
 
 </head>
+
 <body>
-    <x-users.header/>
-    <x-users.navbar/>
-    <main >
-        <x-users.homepage-banner/>
+    <x-users.header />
+    <x-users.navbar />
+    <main>
+        @if (request()->routeIs('homepage'))
+            <x-users.homepage-banner />
+        @endif
         @yield('content')
-        <x-users.homepage-features/>
+        @if (request()->routeIs('homepage'))
+            <x-users.homepage-features />
+        @endif
     </main>
-    <x-users.footer/>
-    <x-users.copy-right/>
+    <x-users.footer />
+    <x-users.copy-right />
 </body>
+
 </html>

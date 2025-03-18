@@ -48,6 +48,6 @@ class RegisterController extends Controller
         \Illuminate\Support\Facades\Auth::login($user);
 
         // Redirect the user to their dashboard or home page
-        return redirect()->route('homepage');
+        return redirect()->route('home');
     }
 }

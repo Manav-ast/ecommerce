@@ -11,9 +11,12 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Route;
 
+
+//User
 Route::middleware("guest:user")->group(function () {
     Route::get("login", [LoginController::class, "index"])->name("user.login");
     Route::post("login", [LoginController::class, "authenticate"])->name("user.authenticate");
@@ -23,11 +26,22 @@ Route::middleware("guest:user")->group(function () {
 
 Route::middleware("auth:user")->group(function () {
     Route::get("logout", [LoginController::class, "logout"])->name("user.logout");
-    Route::get("/", [HomepageController::class, "index"])->name("homepage");
-    Route::get('/navbar', [CategoryController::class, 'index']);
-    Route::get('/', [CategoryController::class, 'index'])->name('home');
+
+    // Homepage Route
+    Route::get("/", [HomepageController::class, "index"])->name("home");
+
+    // Navbar (or Global Categories) Route (Change Path)
+    Route::get("/categories", [CategoryController::class, "index"])->name("categories.list");
+
+    // Shop & Products Routes
+    Route::get("/shop", [ProductController::class, "index"])->name("shop.index");
+    Route::get('/shop/filter', [ProductController::class, 'filter'])->name('shop.filter');
+    Route::get("/products/{slug}", [ProductController::class, "show"])->name("shop.show");
 });
 
+
+
+//Admin
 Route::prefix("admin")->group(function () {
 
     Route::middleware("guest:admin")->group(function () {

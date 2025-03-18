@@ -1,5 +1,6 @@
-@extends('layouts.users.app') 
+@extends('layouts.users.app')
 
 @section('content')
-    <x-categories :categories="$categories" />
+    <x-users.homepage-banner />
+    <x-users.categories :categories="$categories" />
 @endsection
