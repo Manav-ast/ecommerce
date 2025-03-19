@@ -9,55 +9,77 @@ use App\Models\Payment;
 use App\Models\Address;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
-    public function checkout()
+    public function index()
     {
+        // Get cart from session
         $cart = session()->get('cart', []);
+
+        // Calculate cart total
+        $cartTotal = array_sum(array_map(function ($item) {
+            return $item['price'] * $item['quantity'];
+        }, $cart));
+
+        // If cart is empty, redirect to cart page
         if (empty($cart)) {
-            return redirect()->route('shop.index')->with('error', 'Your cart is empty.');
+            return redirect()->route('cart.show')->with('error', 'Your cart is empty');
         }
 
-        return view('pages.checkout', compact('cart'));
+        // Get countries for dropdown
+        $countries = $this->getCountries();
+
+        return view('pages.checkout', compact('cart', 'cartTotal', 'countries'));
     }
 
-    public function placeOrder(Request $request)
+    public function store(Request $request)
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'region' => 'required|string|max:100',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'postal' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|max:100',
             'payment_method' => 'required|in:credit_card,paypal',
         ]);
 
+        // dd($validator);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Get cart from session
+        $cart = session()->get('cart', []);
+
+        dd($cart);
+        // Calculate total price
+        $totalPrice = array_sum(array_map(function ($item) {
+            return $item['price'] * $item['quantity'];
+        }, $cart));
+
+        // Begin transaction
         DB::beginTransaction();
 
         try {
-            // Store the address
-            $address = Address::create([
-                'user_id' => Auth::id(),
-                'address_line1' => $request->address,
-                'city' => $request->city,
-                'postal_code' => $request->postal,
-                'country' => $request->country,
-                'type' => 'shipping',
-            ]);
-
-            // Create Order
+            // Create order
             $order = Order::create([
                 'user_id' => Auth::id(),
-                'order_status' => 'Pending',
-                'total_price' => collect(session('cart'))->sum(fn($item) => $item['price'] * $item['quantity']),
+                'order_status' => 'pending',
+                'total_price' => $totalPrice,
+                'order_date' => now(),
             ]);
 
-            // Add Items to Order
-            foreach (session('cart') as $productId => $item) {
+            // Create order items
+            foreach ($cart as $productId => $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $productId,
@@ -66,30 +88,56 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            // Store Payment
+            // Create payment
             Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $request->payment_method,
-                'payment_status' => 'Pending',
-                'amount' => $order->total_price,
+                'payment_status' => 'pending',
+                'amount' => $totalPrice,
+                'payment_date' => now(),
             ]);
 
-            // Clear Cart
-            session()->forget('cart');
-            session()->put('cart_count', 0);
+            // Save billing address
+            Address::create([
+                'user_id' => Auth::id(),
+                'address_line1' => $request->address,
+                'city' => $request->city,
+                'state' => '', // You might want to add state field to your form
+                'postal_code' => $request->postal,
+                'country' => $request->region,
+                'type' => 'billing',
+            ]);
 
+            // Clear cart
+            session()->forget('cart');
+            session()->forget('cart_count');
+
+            // Commit transaction
             DB::commit();
 
-            return redirect()->route('order.success', ['order_id' => $order->id])->with('success', 'Order placed successfully!');
+            return redirect()->route('checkout.success', ['order' => $order->id]);
         } catch (\Exception $e) {
+            // Rollback transaction
             DB::rollBack();
-            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+
+            return redirect()->back()
+                ->with('error', 'Something went wrong while processing your order: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
-    public function orderSuccess($orderId)
+    public function success($orderId)
     {
-        $order = Order::with('orderItems.product')->findOrFail($orderId);
+        $order = Order::with(['orderItems.product', 'payment'])->findOrFail($orderId);
+
         return view('user.order-success', compact('order'));
+    }
+
+    private function getCountries()
+    {
+        return [
+            'IN' => 'INDIA',
+            // Add more countries as needed
+        ];
     }
 }

@@ -13,32 +13,37 @@
                 <!-- Category Name -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Category Name</label>
-                    <input type="text" name="name" id="category_name" required
+                    <input type="text" name="name" id="category_name"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter category name">
+                    <span class="text-red-500 text-sm hidden" id="error-name"></span>
                 </div>
 
-                <!-- Slug (Editable) -->
+                <!-- Slug -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Slug</label>
-                    <input type="text" name="slug" id="category_slug" required
+                    <input type="text" name="slug" id="category_slug"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Auto-generated slug">
+                    <span class="text-red-500 text-sm hidden" id="error-slug"></span>
                 </div>
 
                 <!-- Category Description -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Description</label>
-                    <textarea name="description" rows="2"
+                    <textarea name="description" id="category_description" rows="2"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter category description"></textarea>
+                    <span class="text-red-500 text-sm hidden" id="error-description"></span>
                 </div>
 
                 <!-- Category Image Upload with Preview -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Upload Image</label>
-                    <input type="file" name="image" id="category_image" required
-                        class="w-full p-2 border rounded-lg focus:outline-none" onchange="previewImage(event)">
+                    <input type="file" name="image" id="category_image"
+                        class="w-full p-2 border rounded-lg focus:outline-none" accept="image/*">
+
+                    <span class="text-red-500 text-sm hidden" id="error-image"></span>
 
                     <!-- Image Preview -->
                     <div class="mt-2 flex justify-center">
@@ -58,55 +63,121 @@
             </form>
         </div>
     </div>
+@endsection
 
-    <!-- JavaScript for Slug & AJAX -->
+@push('scripts')
     <script>
-        // Auto-generate slug from name
-        document.getElementById('category_name').addEventListener('input', function() {
-            let slug = this.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-            document.getElementById('category_slug').value = slug;
-        });
+        $(document).ready(function() {
+            // Auto-generate slug from category name
+            $('#category_name').on('input', function() {
+                let slug = $(this).val().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+                $('#category_slug').val(slug);
+            });
 
-        // Show Image Preview
-        function previewImage(event) {
-            const imagePreview = document.getElementById('image_preview');
-            const file = event.target.files[0];
+            // Show Image Preview
+            $('#category_image').on('change', function() {
+                let file = this.files[0];
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.classList.remove('hidden'); // Show preview
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#image_preview').attr('src', e.target.result).removeClass('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
 
-        // AJAX Form Submission
-        document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+            // Clear validation errors when input changes
+            $('input, textarea').on('input change', function() {
+                let errorId = 'error-' + $(this).attr('name');
+                $('#' + errorId).addClass('hidden');
+            });
 
-            let formData = new FormData(this);
-
-            fetch("{{ route('admin.categories.store') }}", {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            // jQuery Validation
+            $("#addCategoryForm").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    slug: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    description: {
+                        maxlength: 500
+                    },
+                    image: {
+                        required: true,
+                        extension: "jpeg|jpg|png|gif"
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Redirect to categories page after 1 second
-                        setTimeout(() => {
-                            window.location.href = "{{ route('admin.categories') }}";
-                        }, 1000);
-                    } else {
-                        alert('Error: ' + data.message);
+                },
+                messages: {
+                    name: {
+                        required: "Please enter a category name",
+                        maxlength: "Category name cannot exceed 255 characters"
+                    },
+                    slug: {
+                        required: "Slug is required",
+                        maxlength: "Slug cannot exceed 255 characters"
+                    },
+                    description: {
+                        maxlength: "Description cannot exceed 500 characters"
+                    },
+                    image: {
+                        required: "Please select an image",
+                        extension: "Please select a valid image file (jpeg, jpg, png, gif)"
                     }
-                })
-                .catch(error => console.error('Error:', error));
+                },
+                errorPlacement: function(error, element) {
+                    // Custom error placement - use existing error spans
+                    let name = element.attr("name");
+                    $("#error-" + name).html(error.text()).removeClass('hidden');
+                },
+                submitHandler: function(form) {
+                    // AJAX Form Submission using jQuery
+                    let formData = new FormData(form);
+
+                    $.ajax({
+                        url: "{{ route('admin.categories.store') }}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            if (data.success) {
+                                $('#successMessage').removeClass('hidden');
+
+                                // Reset form after success
+                                setTimeout(function() {
+                                    window.location.href =
+                                        "{{ route('admin.categories') }}";
+                                }, 1000);
+                            } else if (data.errors) {
+                                // Show validation errors
+                                $.each(data.errors, function(key, value) {
+                                    $('#error-' + key).text(value[0]).removeClass(
+                                        'hidden');
+                                });
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            });
+
+            // Add additional method for file extension validation
+            $.validator.addMethod("extension", function(value, element, param) {
+                param = typeof param === "string" ? param.replace(/,/g, "|") : "png|jpe?g|gif";
+                return this.optional(element) || value.match(new RegExp("\\.(" + param + ")$", "i"));
+            }, "Please select a valid file with the correct extension.");
         });
     </script>
-@endsection
+@endpush

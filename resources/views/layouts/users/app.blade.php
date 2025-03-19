@@ -14,7 +14,7 @@
     {{-- @vite('resources/css/app.css', 'resources/js/app.js') --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    @stack('styles')
 
 </head>
 
@@ -32,6 +32,8 @@
     </main>
     <x-users.footer />
     <x-users.copy-right />
+
+    @stack('scripts')
 </body>
 
 </html>

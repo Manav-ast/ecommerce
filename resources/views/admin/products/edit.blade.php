@@ -81,8 +81,9 @@
             </form>
         </div>
     </div>
-
-    <!-- JavaScript for Slug & Image Preview -->
+@endsection
+<!-- JavaScript for Slug & Image Preview -->
+@push('scripts')
     <script>
         $(document).ready(function() {
             // Auto-generate slug from name
@@ -91,20 +92,117 @@
                 $("#product_slug").val(slug);
             });
 
-            // Show Image Preview
-            function previewImage(event) {
-                const imagePreview = $("#image_preview");
+            // Show Image Preview - Fix compatibility with existing code
+            window.previewImage = function(event) {
                 const file = event.target.files[0];
 
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        imagePreview.attr("src", e.target.result);
+                        $("#image_preview").attr("src", e.target.result);
                     };
                     reader.readAsDataURL(file);
                 }
+            };
+
+            // Add error spans if not already present
+            $('input, select').each(function() {
+                let name = $(this).attr('name');
+                if (!name) return;
+
+                name = name.replace('[]', '');
+                if ($('#error-' + name).length === 0) {
+                    $(this).after('<span class="text-red-500 text-sm hidden" id="error-' + name +
+                        '"></span>');
+                }
+            });
+
+            // Clear validation errors when input changes
+            $('input, select').on('input change', function() {
+                let name = $(this).attr('name');
+                if (!name) return;
+
+                let errorId = 'error-' + name.replace('[]', '');
+                $('#' + errorId).addClass('hidden');
+            });
+
+            // Initialize jQuery Validator
+            $("#editProductForm").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    slug: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    price: {
+                        required: true,
+                        number: true,
+                        min: 0
+                    },
+                    stock_quantity: {
+                        required: true,
+                        digits: true,
+                        min: 0
+                    },
+                    image: {
+                        required: false,
+                        extension: "jpeg|jpg|png|gif"
+                    },
+                    "categories[]": {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter a product name",
+                        maxlength: "Product name cannot exceed 255 characters"
+                    },
+                    slug: {
+                        required: "Slug is required",
+                        maxlength: "Slug cannot exceed 255 characters"
+                    },
+                    price: {
+                        required: "Please enter a price",
+                        number: "Please enter a valid price",
+                        min: "Price must be greater than or equal to 0"
+                    },
+                    stock_quantity: {
+                        required: "Please enter stock quantity",
+                        digits: "Stock quantity must be a whole number",
+                        min: "Stock quantity must be greater than or equal to 0"
+                    },
+                    image: {
+                        extension: "Please select a valid image file (jpeg, jpg, png, gif)"
+                    },
+                    "categories[]": {
+                        required: "Please select at least one category"
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    let name = element.attr("name");
+                    if (!name) return;
+
+                    name = name.replace('[]', '');
+                    $("#error-" + name).html(error.text()).removeClass('hidden');
+                },
+                // Preserve the original form submission behavior instead of using AJAX
+                // This approach is safer and will use Laravel's built-in validation and redirect
+                submitHandler: function(form) {
+                    form.submit(); // Submit the form normally
+                    return true;
+                }
+            });
+
+            // Add additional method for file extension validation if not already defined
+            if (!$.validator.methods.extension) {
+                $.validator.addMethod("extension", function(value, element, param) {
+                    param = typeof param === "string" ? param.replace(/,/g, "|") : "png|jpe?g|gif";
+                    return this.optional(element) || value.match(new RegExp("\\.(" + param + ")$", "i"));
+                }, "Please select a valid file with the correct extension.");
             }
-            window.previewImage = previewImage; // Make function global for onchange event
         });
     </script>
-@endsection
+@endpush

@@ -16,14 +16,13 @@
         <!-- Content Section -->
         <div class="p-6 flex-grow relative">
             <h4
-                class="uppercase font-semibold text-lg mb-1 text-gray-800 tracking-wide hover:text-blue-500 transition-colors duration-200">
+                class="uppercase font-semibold text-base mb-1 text-gray-800 tracking-wide hover:text-blue-500 transition-colors duration-200">
                 {{ $product->name }}
             </h4>
 
             <!-- Category Display -->
             @if ($product->categories->count())
                 <p class="text-sm text-gray-500 mb-3">
-                    {{-- Category: --}}
                     @foreach ($product->categories as $category)
                         <span class="bg-gray-200 text-gray-700 px-3 py-1 text-xs mr-1 rounded-full">
                             {{ $category->name }}
@@ -31,25 +30,22 @@
                     @endforeach
                 </p>
             @endif
-
-            <!-- Price -->
-            <div class="flex items-center justify-between mb-4">
-                <p class="text-2xl text-blue-500 font-bold">${{ number_format($product->price, 2) }}</p>
-                @if ($product->old_price)
-                    <p class="text-sm text-gray-400 line-through">${{ number_format($product->old_price, 2) }}</p>
-                @endif
-            </div>
         </div>
     </a>
 
-    <!-- Footer Section (Add to Cart button remains outside the clickable area) -->
-    <div class="px-6 pb-6">
+    <!-- Footer Section: Price and Add to Cart -->
+    <div class="px-6 pb-6 flex items-center justify-between">
+        <div>
+            <p class="text-lg text-blue-500 font-bold">${{ number_format($product->price, 2) }}</p>
+            @if ($product->old_price)
+                <p class="text-xs text-gray-400 line-through">${{ number_format($product->old_price, 2) }}</p>
+            @endif
+        </div>
         <button
-            class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow hover:bg-blue-700 transition"
+            class="bg-blue-500 text-white px-6 py-2 rounded-full text-sm font-medium shadow hover:bg-blue-700 transition"
             onclick="addToCart({{ $product->id }})">
             <i class="fa-solid fa-bag-shopping"></i> Add to Cart
         </button>
-
     </div>
 </div>
 
@@ -73,7 +69,13 @@
             .then(data => {
                 if (data.success) {
                     // Update the cart count dynamically
-                    document.getElementById("cart-count").innerText = data.cart_count;
+                    let cartCountElement = document.getElementById("cart-count");
+                    cartCountElement.innerText = data.cart_count;
+
+                    // Ensure cart count is visible
+                    if (data.cart_count > 0) {
+                        cartCountElement.classList.remove("hidden");
+                    }
                 }
             })
             .catch(error => console.error("Error:", error));
@@ -99,6 +101,7 @@
 
                     let cartCountElement = document.getElementById("cart-count");
                     cartCountElement.innerText = data.cartCount;
+
                     if (data.cartCount == 0) {
                         cartCountElement.classList.add("hidden");
                     } else {
@@ -127,6 +130,7 @@
 
                     let cartCountElement = document.getElementById("cart-count");
                     cartCountElement.innerText = data.cartCount;
+
                     if (data.cartCount == 0) {
                         cartCountElement.classList.add("hidden");
                     } else {

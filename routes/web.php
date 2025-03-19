@@ -41,15 +41,18 @@ Route::middleware("auth:user")->group(function () {
     Route::get("/products/{slug}", [ProductController::class, "show"])->name("shop.show");
 
     // Cart Routes
-    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
     Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
 
     // Checkout Routes
-    Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-    Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
-    Route::get('/order-success/{order_id}', [CheckoutController::class, 'orderSuccess'])->name('order.success');
+    // Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+    // Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('place.order');
+    // Route::get('/order-success/{orderId}', [CheckoutController::class, 'orderSuccess'])->name('order.success');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
 

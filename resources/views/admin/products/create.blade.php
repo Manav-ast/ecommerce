@@ -82,70 +82,146 @@
                 </button>
 
                 <!-- Success Message -->
-                <p id="successMessage" class="text-green-600 font-semibold text-center hidden mt-2">Product added successfully!</p>
+                <p id="successMessage" class="text-green-600 font-semibold text-center hidden mt-2">Product added
+                    successfully!</p>
             </form>
         </div>
     </div>
-
-    <!-- JavaScript for Slug & AJAX -->
+@endsection
+<!-- JavaScript for Slug & AJAX -->
+@push('scripts')
     <script>
-        // Auto-generate slug from name
-        document.getElementById('product_name').addEventListener('input', function() {
-            let slug = this.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-            document.getElementById('product_slug').value = slug;
-        });
+        $(document).ready(function() {
+            // Auto-generate slug from name
+            $('#product_name').on('input', function() {
+                let slug = $(this).val().toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                $('#product_slug').val(slug);
+            });
 
-        // Show Image Preview
-        function previewImage(event) {
-            const imagePreview = document.getElementById('image_preview');
-            const file = event.target.files[0];
+            // Show Image Preview
+            $('#product_image').on('change', function(event) {
+                const file = this.files[0];
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.classList.remove('hidden'); // Show preview
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#image_preview').attr('src', e.target.result).removeClass('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
 
-        // AJAX Form Submission
-        document.getElementById('addProductForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+            // Clear validation errors when input changes
+            $('input, select').on('input change', function() {
+                let errorId = 'error-' + $(this).attr('name').replace('[]', '');
+                $('#' + errorId).addClass('hidden');
+            });
 
-            let formData = new FormData(this);
-
-            fetch("{{ route('admin.products.store') }}", {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            // Initialize jQuery Validator
+            $("#addProductForm").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    slug: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    price: {
+                        required: true,
+                        number: true,
+                        min: 0
+                    },
+                    stock_quantity: {
+                        required: true,
+                        digits: true,
+                        min: 0
+                    },
+                    image: {
+                        required: true,
+                        extension: "jpeg|jpg|png|gif"
+                    },
+                    "categories[]": {
+                        required: true
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('successMessage').classList.remove('hidden');
-                        
-                        // Reset form after success
-                        setTimeout(() => {
-                            window.location.href = "{{ route('admin.products') }}";
-                        }, 1000);
-                    } else if (data.errors) {
-                        // Show validation errors
-                        for (let key in data.errors) {
-                            let errorElement = document.getElementById('error-' + key);
-                            if (errorElement) {
-                                errorElement.textContent = data.errors[key][0];
-                                errorElement.classList.remove('hidden');
+                },
+                messages: {
+                    name: {
+                        required: "Please enter a product name",
+                        maxlength: "Product name cannot exceed 255 characters"
+                    },
+                    slug: {
+                        required: "Slug is required",
+                        maxlength: "Slug cannot exceed 255 characters"
+                    },
+                    price: {
+                        required: "Please enter a price",
+                        number: "Please enter a valid price",
+                        min: "Price must be greater than or equal to 0"
+                    },
+                    stock_quantity: {
+                        required: "Please enter stock quantity",
+                        digits: "Stock quantity must be a whole number",
+                        min: "Stock quantity must be greater than or equal to 0"
+                    },
+                    image: {
+                        required: "Please select an image",
+                        extension: "Please select a valid image file (jpeg, jpg, png, gif)"
+                    },
+                    "categories[]": {
+                        required: "Please select at least one category"
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    // Custom error placement - use existing error spans
+                    let name = element.attr("name").replace('[]', '');
+                    $("#error-" + name).html(error.text()).removeClass('hidden');
+                },
+                submitHandler: function(form) {
+                    // AJAX Form Submission using jQuery
+                    let formData = new FormData(form);
+
+                    $.ajax({
+                        url: "{{ route('admin.products.store') }}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            if (data.success) {
+                                $('#successMessage').removeClass('hidden');
+
+                                // Reset form after success
+                                setTimeout(function() {
+                                    window.location.href =
+                                        "{{ route('admin.products') }}";
+                                }, 1000);
+                            } else if (data.errors) {
+                                // Show validation errors
+                                $.each(data.errors, function(key, value) {
+                                    $('#error-' + key).text(value[0]).removeClass(
+                                        'hidden');
+                                });
+                            } else {
+                                alert('Error: ' + data.message);
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
                         }
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+                    });
+                }
+            });
+
+            // Add additional method for file extension validation
+            $.validator.addMethod("extension", function(value, element, param) {
+                param = typeof param === "string" ? param.replace(/,/g, "|") : "png|jpe?g|gif";
+                return this.optional(element) || value.match(new RegExp("\\.(" + param + ")$", "i"));
+            }, "Please select a valid file with the correct extension.");
         });
     </script>
-@endsection
+@endpush

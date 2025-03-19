@@ -17,6 +17,10 @@
                 <input type="text" name="name" id="category_name" value="{{ $category->name }}" required
                     class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter category name">
+                <span class="text-red-500 text-sm hidden" id="error-name"></span>
+                @error('name')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <!-- Slug (Editable) -->
@@ -25,6 +29,10 @@
                 <input type="text" name="slug" id="category_slug" value="{{ $category->slug }}" required
                     class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Auto-generated slug">
+                <span class="text-red-500 text-sm hidden" id="error-slug"></span>
+                @error('slug')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <!-- Category Description -->
@@ -33,6 +41,10 @@
                 <textarea name="description" rows="2"
                     class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter category description">{{ $category->description }}</textarea>
+                <span class="text-red-500 text-sm hidden" id="error-description"></span>
+                @error('description')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <!-- Category Image Upload with Preview -->
@@ -40,6 +52,7 @@
                 <label class="block text-gray-700 font-semibold mb-1">Upload Image</label>
                 <input type="file" name="image" id="category_image"
                     class="w-full p-2 border rounded-lg focus:outline-none" onchange="previewImage(event)">
+                <span class="text-red-500 text-sm hidden" id="error-image"></span>
 
                 <!-- Image Preview -->
                 <div class="mt-2 flex justify-center">
@@ -53,6 +66,9 @@
                 class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
                 Update Category
             </button>
+
+            <!-- Success Message -->
+            <p id="successMessage" class="text-green-600 font-semibold text-center hidden mt-2">Category updated successfully!</p>
         </form>
     </div>
 </div>
@@ -65,6 +81,59 @@
             let slug = $(this).val().toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
             $("#category_slug").val(slug);
         });
+
+        // Clear validation errors when input changes
+        $('input, textarea').on('input change', function() {
+            let errorId = 'error-' + $(this).attr('name');
+            $('#' + errorId).addClass('hidden');
+        });
+
+        // jQuery Validation
+        $("#editCategoryForm").validate({
+            rules: {
+                name: {
+                    required: true,
+                    maxlength: 255
+                },
+                slug: {
+                    required: true,
+                    maxlength: 255
+                },
+                description: {
+                    maxlength: 500
+                },
+                image: {
+                    extension: "jpeg|jpg|png|gif"
+                }
+            },
+            messages: {
+                name: {
+                    required: "Please enter a category name",
+                    maxlength: "Category name cannot exceed 255 characters"
+                },
+                slug: {
+                    required: "Slug is required",
+                    maxlength: "Slug cannot exceed 255 characters"
+                },
+                description: {
+                    maxlength: "Description cannot exceed 500 characters"
+                },
+                image: {
+                    extension: "Please select a valid image file (jpeg, jpg, png, gif)"
+                }
+            },
+            errorPlacement: function(error, element) {
+                // Custom error placement - use existing error spans
+                let name = element.attr("name");
+                $("#error-" + name).html(error.text()).removeClass('hidden');
+            }
+        });
+
+        // Add additional method for file extension validation
+        $.validator.addMethod("extension", function(value, element, param) {
+            param = typeof param === "string" ? param.replace(/,/g, "|") : "png|jpe?g|gif";
+            return this.optional(element) || value.match(new RegExp("\\.(" + param + ")$", "i"));
+        }, "Please select a valid file with the correct extension.");
 
         // Show Image Preview
         function previewImage(event) {
