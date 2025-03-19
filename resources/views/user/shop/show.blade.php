@@ -51,7 +51,8 @@
                     <div class="flex items-center border border-gray-300 rounded-full">
                         <button type="button" onclick="decreaseQuantity()"
                             class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-l-full">-</button>
-                        <input type="number" id="quantity" value="1" min="1" max="{{ $product->stock_quantity }}"
+                        <input type="number" id="quantity" value="1" min="1"
+                            max="{{ $product->stock_quantity }}"
                             class="w-16 text-center text-lg font-medium border-none focus:ring-0">
                         <button type="button" onclick="increaseQuantity()"
                             class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-r-full">+</button>
@@ -60,10 +61,12 @@
 
                 <!-- Add to Cart & Wishlist -->
                 <div class="mt-6 flex gap-4">
-                    <button class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow hover:bg-blue-700 transition"
+                    <button
+                        class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow hover:bg-blue-700 transition"
                         onclick="addToCart({{ $product->id }})">
                         <i class="fa-solid fa-bag-shopping"></i> Add to Cart
                     </button>
+
                 </div>
             </div>
         </div>
@@ -98,8 +101,27 @@
         }
 
         function addToCart(productId) {
-            let quantity = document.getElementById("quantity").value;
-            console.log(`Added ${quantity} of product ${productId} to cart`);
+            let quantity = document.getElementById("quantity") ? document.getElementById("quantity").value : 1;
+
+            fetch("{{ url('/cart/add') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: quantity
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the cart count dynamically
+                        document.getElementById("cart-count").innerText = data.cart_count;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
         }
     </script>
 @endsection

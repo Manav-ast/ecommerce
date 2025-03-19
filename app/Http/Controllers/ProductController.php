@@ -13,7 +13,7 @@ class ProductController extends Controller
         $categories = Category::withCount('products')->get(); // ✅ This will add 'products_count' to each category
         $products = Product::paginate(12); // ✅ Paginate products
 
-        return view('user.shop.index', compact('categories', 'products'));   
+        return view('user.shop.index', compact('categories', 'products'));
     }
 
     public function show($slug)
@@ -28,15 +28,15 @@ class ProductController extends Controller
 
     public function filter(Request $request)
     {
-        $categories = $request->categories ? explode(',', $request->categories) : [];
+        $categorySlugs = $request->categories ? explode(',', $request->categories) : [];
         $minPrice = $request->min_price ?? 0;
         $maxPrice = $request->max_price ?? 10000;
 
         $query = Product::query();
 
-        if (!empty($categories)) {
-            $query->whereHas('categories', function ($q) use ($categories) {
-                $q->whereIn('categories.id', $categories);
+        if (!empty($categorySlugs)) {
+            $query->whereHas('categories', function ($q) use ($categorySlugs) {
+                $q->whereIn('categories.slug', $categorySlugs);
             });
         }
 

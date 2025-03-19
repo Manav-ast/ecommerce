@@ -1,5 +1,6 @@
-<nav class="bg-blue-500">
+<nav class="bg-blue-500 z-20">
     <div class="container flex items-center">
+        <!-- Categories Dropdown (Hidden on small screens) -->
         <!-- Categories Dropdown (Hidden on small screens) -->
         <div class="px-8 py-4 bg-blue-900 items-center cursor-pointer relative group hidden md:block">
             <span class="text-white">
@@ -9,9 +10,9 @@
 
             <!-- Dropdown -->
             <div
-                class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible z-10">
+                class=" absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible z-20">
                 @foreach ($categories as $category)
-                    <a href="{{ url('/category/' . $category->slug) }}"
+                    <a href="{{ url('/shop?category=' . $category->slug) }}"
                         class="flex items-center px-6 py-3 hover:bg-blue-100 transition">
                         <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
                             class="w-5 h-5 object-contain">
@@ -20,6 +21,7 @@
                 @endforeach
             </div>
         </div>
+
 
         <!-- Main Navigation Links -->
         <div class="flex items-center justify-between flex-grow md:pl-12 py-5">
@@ -39,7 +41,7 @@
                         <i class="fa-solid fa-chevron-down ml-2"></i>
                     </button>
                     <div
-                        class="absolute right-0 w-48 bg-white shadow-md rounded-md py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition duration-300">
+                        class="absolute right-0 w-48 bg-white shadow-md rounded-md py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition duration-300 z-20">
                         {{-- <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Profile</a> --}}
                         <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Orders</a>
                         <form method="GET" action="{{ route('user.logout') }}">

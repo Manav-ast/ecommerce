@@ -25,7 +25,7 @@
                 <p class="text-sm text-gray-500 mb-3">
                     {{-- Category: --}}
                     @foreach ($product->categories as $category)
-                        <span class="bg-gray-200 text-gray-700 px-3 py-1 text-sm mr-1.5 rounded-full">
+                        <span class="bg-gray-200 text-gray-700 px-3 py-1 text-xs mr-1 rounded-full">
                             {{ $category->name }}
                         </span>
                     @endforeach
@@ -45,9 +45,94 @@
     <!-- Footer Section (Add to Cart button remains outside the clickable area) -->
     <div class="px-6 pb-6">
         <button
-            class="bg-blue-500 border border-blue-500 text-white px-8 py-3 font-medium rounded-full uppercase flex items-center justify-center gap-2 hover:bg-transparent hover:text-blue-700 transition-all duration-300 w-full "
-            onclick="event.stopPropagation(); addToCart({{ $product->id }})">
+            class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow hover:bg-blue-700 transition"
+            onclick="addToCart({{ $product->id }})">
             <i class="fa-solid fa-bag-shopping"></i> Add to Cart
         </button>
+
     </div>
 </div>
+
+
+<script>
+    function addToCart(productId) {
+        let quantity = document.getElementById("quantity") ? document.getElementById("quantity").value : 1;
+
+        fetch("{{ url('/cart/add') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the cart count dynamically
+                    document.getElementById("cart-count").innerText = data.cart_count;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+
+    function updateCart(productId, action) {
+        fetch("{{ url('/cart/update') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    action: action
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("cart-items").innerHTML = data.cartHtml;
+                    document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
+
+                    let cartCountElement = document.getElementById("cart-count");
+                    cartCountElement.innerText = data.cartCount;
+                    if (data.cartCount == 0) {
+                        cartCountElement.classList.add("hidden");
+                    } else {
+                        cartCountElement.classList.remove("hidden");
+                    }
+                }
+            });
+    }
+
+    function removeFromCart(productId) {
+        fetch("{{ url('/cart/remove') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    product_id: productId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("cart-items").innerHTML = data.cartHtml;
+                    document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
+
+                    let cartCountElement = document.getElementById("cart-count");
+                    cartCountElement.innerText = data.cartCount;
+                    if (data.cartCount == 0) {
+                        cartCountElement.classList.add("hidden");
+                    } else {
+                        cartCountElement.classList.remove("hidden");
+                    }
+                }
+            });
+    }
+</script>
