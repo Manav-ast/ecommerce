@@ -1,24 +1,6 @@
 @extends('layouts.users.app')
 
 @section('content')
-@php
-    $cartItems = [
-        [
-            'image' => 'assets/images/product1.jpg',
-            'name' => 'ITALIAN L SHAPE',
-            'availability' => 'In Stock',
-            'quantity' => 1,
-            'price' => 320.00
-        ],
-        [
-            'image' => 'assets/images/product2.jpg',
-            'name' => 'DINING TABLE',
-            'availability' => 'In Stock',
-            'quantity' => 1,
-            'price' => 320.00
-        ],
-    ];
-@endphp
 
 <div class="w-full max-w-4xl mx-auto py-10">
     <div class="flex flex-col lg:flex-row items-start gap-6">

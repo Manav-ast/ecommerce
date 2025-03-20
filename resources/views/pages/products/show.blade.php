@@ -208,7 +208,33 @@
     }
 
     function addToCart(productId) {
-        console.log(`Added product ${productId} to cart`);
+        let quantity = document.getElementById("quantity") ? document.getElementById("quantity").textContent : 1;
+        
+        fetch("{{ url('/cart/add') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the cart count dynamically
+                let cartCountElement = document.getElementById("cart-count");
+                cartCountElement.innerText = data.cart_count;
+
+                // Ensure cart count is visible
+                if (data.cart_count > 0) {
+                    cartCountElement.classList.remove("hidden");
+                }
+            }
+        })
+        .catch(error => console.error("Error:", error));
     }
 </script>
 @endsection

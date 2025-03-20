@@ -7,21 +7,27 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Address;
+use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     public function index()
     {
         // Get cart from session
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
 
         // Calculate cart total
-        $cartTotal = array_sum(array_map(function ($item) {
-            return $item['price'] * $item['quantity'];
-        }, $cart));
+        $cartTotal = $this->cartService->getCartTotal();
 
         // If cart is empty, redirect to cart page
         if (empty($cart)) {
@@ -58,13 +64,15 @@ class CheckoutController extends Controller
         }
 
         // Get cart from session
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
 
-        dd($cart);
+        // If cart is empty, redirect to cart page
+        if (empty($cart)) {
+            return redirect()->route('cart.show')->with('error', 'Your cart is empty');
+        }
+
         // Calculate total price
-        $totalPrice = array_sum(array_map(function ($item) {
-            return $item['price'] * $item['quantity'];
-        }, $cart));
+        $totalPrice = $this->cartService->getCartTotal();
 
         // Begin transaction
         DB::beginTransaction();
@@ -109,8 +117,7 @@ class CheckoutController extends Controller
             ]);
 
             // Clear cart
-            session()->forget('cart');
-            session()->forget('cart_count');
+            $this->cartService->clearCart();
 
             // Commit transaction
             DB::commit();

@@ -27,7 +27,7 @@
                             </p>
                         </div>
                         <div class="space-y-3">
-                            <a href="{{ route('checkout') }}"
+                            <a href="{{ route('checkout.index') }}"
                                 class="block w-full px-4 py-2 text-white bg-blue-500 border border-blue-500 rounded-lg hover:bg-blue-600 transition-all duration-200 text-xs font-medium text-center">
                                 Checkout
                             </a>
