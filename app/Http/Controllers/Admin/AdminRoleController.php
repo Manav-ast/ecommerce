@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Roles;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Admin\RoleRequest;
 
 class AdminRoleController extends Controller
 {
@@ -28,15 +29,10 @@ class AdminRoleController extends Controller
     }
 
     // Store new role
-    public function store(Request $request)
+    public function store(RoleRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'role_name' => 'required|string|max:100|unique:roles,role_name',
-                'description' => 'nullable|string',
-            ]);
-
-            Roles::create($validated);
+            Roles::create($request->validated());
 
             // **Check if request is AJAX**
             if ($request->ajax()) {
@@ -82,17 +78,11 @@ class AdminRoleController extends Controller
     }
 
     // Update role details
-    public function update(Request $request, $id)
+    public function update(RoleRequest $request, $id)
     {
         try {
             $role = Roles::findOrFail($id);
-
-            $validated = $request->validate([
-                'role_name' => 'required|string|max:100|unique:roles,role_name,' . $role->id,
-                'description' => 'nullable|string',
-            ]);
-
-            $role->update($validated);
+            $role->update($request->validated());
 
             return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully!');
         } catch (\Exception $e) {

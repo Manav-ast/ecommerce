@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Admin\UserRequest;
 
 class AdminUserController extends Controller
 {
@@ -30,25 +31,16 @@ class AdminUserController extends Controller
     }
 
     // Store new user
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
         try {
-            // Validate input
-            $validated = $request->validate([
-                'name' => 'required|string|max:100',
-                'email' => 'required|string|email|max:100|unique:users',
-                'phone_no' => 'required|string|size:10|unique:users',
-                'password' => 'required|string|min:6|confirmed',
-                'status' => 'required|in:active,inactive',
-            ]);
-
             // Create user
             $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone_no' => $validated['phone_no'],
-                'password' => Hash::make($validated['password']), // Secure password
-                'status' => $validated['status'],
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_no' => $request->phone_no,
+                'password' => Hash::make($request->password), // Secure password
+                'status' => $request->status,
             ]);
 
             return redirect()->route('admin.users')->with('success', 'User created successfully!');
@@ -71,27 +63,18 @@ class AdminUserController extends Controller
     }
 
     // Update user
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
         try {
             $user = User::findOrFail($id);
 
-            // Validate input
-            $validated = $request->validate([
-                'name' => 'required|string|max:100',
-                'email' => 'required|string|email|max:100|unique:users,email,' . $user->id,
-                'phone_no' => 'required|string|size:10|unique:users,phone_no,' . $user->id,
-                'password' => 'nullable|string|min:6|confirmed',
-                'status' => 'required|in:active,inactive',
-            ]);
-
             // Update user data
             $user->update([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone_no' => $validated['phone_no'],
-                'status' => $validated['status'],
-                'password' => $request->filled('password') ? Hash::make($validated['password']) : $user->password,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_no' => $request->phone_no,
+                'status' => $request->status,
+                'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
             ]);
 
             return redirect()->route('admin.users')->with('success', 'User updated successfully!');

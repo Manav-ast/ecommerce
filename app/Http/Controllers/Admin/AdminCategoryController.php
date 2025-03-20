@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Http\Requests\Admin\CategoryRequest;
 
 class AdminCategoryController extends Controller
 {
@@ -30,16 +31,11 @@ class AdminCategoryController extends Controller
     }
 
     // Store new category
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'slug' => 'required|string|max:255|unique:categories,slug',
-                'description' => 'nullable|string',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
-
+            $validated = $request->validated();
+            
             // Handle Image Upload
             $imagePath = $request->file('image')->store('category_images', 'public');
 
@@ -71,17 +67,11 @@ class AdminCategoryController extends Controller
     }
 
     // Update category
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         try {
             $category = Category::findOrFail($id);
-
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
-                'description' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
+            $validated = $request->validated();
 
             // Handle Image Upload
             if ($request->hasFile('image')) {

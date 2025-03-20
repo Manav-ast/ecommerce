@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Admin\ProductRequest;
 
 class AdminProductController extends Controller
 {
@@ -36,17 +37,10 @@ class AdminProductController extends Controller
     }
 
     // Store new product
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'slug' => 'required|string|max:255|unique:products,slug',
-                'price' => 'required|numeric|min:0',
-                'stock_quantity' => 'required|integer|min:0',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'categories' => 'array|required',
-            ]);
+            $validated = $request->validated();
 
             // Handle Image Upload
             $imagePath = $request->file('image')->store('product_images', 'public');
@@ -84,19 +78,11 @@ class AdminProductController extends Controller
     }
 
     // Update product
-    public function update(Request $request, $id)
+    public function update(ProductRequest $request, $id)
     {
         try {
             $product = Product::findOrFail($id);
-
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'slug' => 'required|string|max:255|unique:products,slug,' . $product->id,
-                'price' => 'required|numeric|min:0',
-                'stock_quantity' => 'required|integer|min:0',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'categories' => 'array|required',
-            ]);
+            $validated = $request->validated();
 
             // Handle Image Upload
             if ($request->hasFile('image')) {

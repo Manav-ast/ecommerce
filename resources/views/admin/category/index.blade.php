@@ -106,8 +106,8 @@
             });
         });
 
-        function openDeleteModal(categoryId) {
-            document.getElementById("deleteForm").action = "/admin/categories/" + categoryId;
+        function openDeleteModal(categorySlug) {
+            document.getElementById("deleteForm").action = "/admin/categories/" + categorySlug;
             document.getElementById("deleteModal").classList.remove("hidden");
         }
 
