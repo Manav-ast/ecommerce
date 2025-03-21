@@ -104,6 +104,7 @@ Route::prefix('admin/orders')->group(function () {
         Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
         Route::get('/search', [AdminOrderController::class, 'search'])->name('admin.orders.search');
         Route::get('/details/{id}', [AdminOrderController::class, 'details'])->name('admin.orders.details');
+        Route::post('/update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     });
 });
 

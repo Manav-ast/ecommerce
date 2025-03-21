@@ -81,62 +81,62 @@
             .catch(error => console.error("Error:", error));
     }
 
-    function updateCart(productId, action) {
-        fetch("{{ url('/cart/update') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    action: action
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("cart-items").innerHTML = data.cartHtml;
-                    document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
+    // function updateCart(productId, action) {
+    //     fetch("{{ url('/cart/update') }}", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    //             },
+    //             body: JSON.stringify({
+    //                 product_id: productId,
+    //                 action: action
+    //             })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 document.getElementById("cart-items").innerHTML = data.cartHtml;
+    //                 document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
 
-                    let cartCountElement = document.getElementById("cart-count");
-                    cartCountElement.innerText = data.cartCount;
+    //                 let cartCountElement = document.getElementById("cart-count");
+    //                 cartCountElement.innerText = data.cartCount;
 
-                    if (data.cartCount == 0) {
-                        cartCountElement.classList.add("hidden");
-                    } else {
-                        cartCountElement.classList.remove("hidden");
-                    }
-                }
-            });
-    }
+    //                 if (data.cartCount == 0) {
+    //                     cartCountElement.classList.add("hidden");
+    //                 } else {
+    //                     cartCountElement.classList.remove("hidden");
+    //                 }
+    //             }
+    //         });
+    // }
 
-    function removeFromCart(productId) {
-        fetch("{{ url('/cart/remove') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({
-                    product_id: productId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("cart-items").innerHTML = data.cartHtml;
-                    document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
+    // function removeFromCart(productId) {
+    //     fetch("{{ url('/cart/remove') }}", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    //             },
+    //             body: JSON.stringify({
+    //                 product_id: productId
+    //             })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 document.getElementById("cart-items").innerHTML = data.cartHtml;
+    //                 document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
 
-                    let cartCountElement = document.getElementById("cart-count");
-                    cartCountElement.innerText = data.cartCount;
+    //                 let cartCountElement = document.getElementById("cart-count");
+    //                 cartCountElement.innerText = data.cartCount;
 
-                    if (data.cartCount == 0) {
-                        cartCountElement.classList.add("hidden");
-                    } else {
-                        cartCountElement.classList.remove("hidden");
-                    }
-                }
-            });
-    }
+    //                 if (data.cartCount == 0) {
+    //                     cartCountElement.classList.add("hidden");
+    //                 } else {
+    //                     cartCountElement.classList.remove("hidden");
+    //                 }
+    //             }
+    //         });
+    // }
 </script>

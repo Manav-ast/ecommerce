@@ -9,6 +9,8 @@ class OrderItem extends Model
 {
     use HasFactory;
 
+    protected $with = ['product'];
+
     protected $fillable = ['order_id', 'product_id', 'quantity', 'price'];
 
     public function order()

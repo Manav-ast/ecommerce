@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\CartService;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
@@ -16,36 +17,56 @@ class CartController extends Controller
 
     public function addToCart(Request $request)
     {
-        $result = $this->cartService->addToCart(
-            $request->product_id,
-            $request->quantity ?? 1
-        );
+        try {
+            $result = $this->cartService->addToCart(
+                $request->product_id,
+                $request->quantity ?? 1
+            );
 
-        return response()->json($result);
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error("Error adding to cart: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Something went wrong while adding to cart.'], 500);
+        }
     }
 
     public function showCart()
     {
-        $cart = $this->cartService->getCart();
-        $cartTotal = $this->cartService->getCartTotal();
+        try {
+            $cart = $this->cartService->getCart();
+            $cartTotal = $this->cartService->getCartTotal();
 
-        return view('user.cart.index', compact('cart', 'cartTotal'));
+            return view('user.cart.index', compact('cart', 'cartTotal'));
+        } catch (\Exception $e) {
+            Log::error("Error showing cart: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while loading your cart.');
+        }
     }
 
     public function updateCart(Request $request)
     {
-        $result = $this->cartService->updateCart(
-            $request->product_id,
-            $request->action
-        );
+        try {
+            $result = $this->cartService->updateCart(
+                $request->product_id,
+                $request->action
+            );
 
-        return response()->json($result);
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error("Error updating cart: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Something went wrong while updating your cart.'], 500);
+        }
     }
 
     public function removeFromCart(Request $request)
     {
-        $result = $this->cartService->removeFromCart($request->product_id);
+        try {
+            $result = $this->cartService->removeFromCart($request->product_id);
 
-        return response()->json($result);
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error("Error removing from cart: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Something went wrong while removing item from cart.'], 500);
+        }
     }
 }

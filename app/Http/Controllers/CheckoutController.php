@@ -5,136 +5,85 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutRequest;
 use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Payment;
-use App\Models\Address;
 use App\Services\CartService;
+use App\Services\CheckoutService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
     protected $cartService;
+    protected $checkoutService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, CheckoutService $checkoutService)
     {
         $this->cartService = $cartService;
+        $this->checkoutService = $checkoutService;
     }
 
     public function index()
     {
-        // Get cart from session
-        $cart = $this->cartService->getCart();
+        try {
+            // Get cart from session
+            $cart = $this->cartService->getCart();
 
-        // Calculate cart total
-        $cartTotal = $this->cartService->getCartTotal();
+            // Calculate cart total
+            $cartTotal = $this->cartService->getCartTotal();
 
-        // If cart is empty, redirect to cart page
-        if (empty($cart)) {
-            return redirect()->route('cart.show')->with('error', 'Your cart is empty');
+            // If cart is empty, redirect to cart page
+            if (empty($cart)) {
+                return redirect()->route('cart.show')->with('error', 'Your cart is empty');
+            }
+
+            // Get countries for dropdown
+            $countries = $this->checkoutService->getCountries();
+
+            return view('pages.checkout', compact('cart', 'cartTotal', 'countries'));
+        } catch (\Exception $e) {
+            Log::error("Error loading checkout page: " . $e->getMessage());
+            return redirect()->route('cart.show')->with('error', 'Something went wrong while loading the checkout page.');
         }
-
-        // Get countries for dropdown
-        $countries = $this->getCountries();
-
-        return view('pages.checkout', compact('cart', 'cartTotal', 'countries'));
     }
 
     public function store(CheckoutRequest $request)
     {
-        // Request is automatically validated by the CheckoutRequest class
-
-        // Get cart from session
-        $cart = $this->cartService->getCart();
-
-        // If cart is empty, redirect to cart page
-        if (empty($cart)) {
-            return redirect()->route('cart.show')->with('error', 'Your cart is empty');
-        }
-
-        // Calculate total price
-        $totalPrice = $this->cartService->getCartTotal();
-
-        // Begin transaction
-        DB::beginTransaction();
-
         try {
-            // Create order
-            $order = Order::create([
-                'user_id' => Auth::id(),
-                'order_status' => 'pending',
-                'total_price' => $totalPrice,
-                'order_date' => now(),
-            ]);
+            // Request is automatically validated by the CheckoutRequest class
 
-            // Create order items
-            foreach ($cart as $productId => $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $productId,
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                ]);
+            // Validate checkout data
+            $validationResult = $this->checkoutService->validateCheckout($request->all());
+            if (!$validationResult['success']) {
+                return redirect()->back()->with('error', $validationResult['message'])->withInput();
             }
 
-            // Create payment
-            Payment::create([
-                'order_id' => $order->id,
-                'payment_method' => $request->payment_method,
-                'payment_status' => 'pending',
-                'amount' => $totalPrice,
-                'payment_date' => now(),
-            ]);
-
-            // Save billing address
-            Address::create([
-                'user_id' => Auth::id(),
-                'address_line1' => $request->address,
-                'address_line2' => $request->address_line2,
-                'city' => $request->city,
-                'state' => $request->state ?? '', // Use state if provided, otherwise empty string
-                'postal_code' => $request->postal,
-                'country' => $request->region,
-                'type' => $request->address_type, // Use the selected address type from the form
-            ]);
+            // Process checkout
+            $result = $this->checkoutService->processCheckout($request->all());
             
-            // Log successful order creation for debugging
-            Log::info('Order created successfully', [
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-                'total_price' => $totalPrice
-            ]);
-
-            // Clear cart
-            $this->cartService->clearCart();
-
-            // Commit transaction
-            DB::commit();
-
-            return redirect()->route('checkout.success', ['order' => $order->id]);
+            if ($result['success']) {
+                return redirect()->route('checkout.success', ['order' => $result['order_id']]);
+            } else {
+                return redirect()->back()->with('error', $result['message'])->withInput();
+            }
         } catch (\Exception $e) {
-            // Rollback transaction
-            DB::rollBack();
-
-            return redirect()->back()
-                ->with('error', 'Something went wrong while processing your order: ' . $e->getMessage())
-                ->withInput();
+            Log::error("Error processing checkout: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Something went wrong while processing your order.')->withInput();
         }
     }
 
     public function success($orderId)
     {
-        $order = Order::with(['orderItems.product', 'payment'])->findOrFail($orderId);
+        try {
+            $order = Order::with(['orderItems.product', 'payment'])->findOrFail($orderId);
 
-        return view('user.order-success', compact('order'));
+            return view('user.order-success', compact('order'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Order not found with ID: {$orderId}");
+            return redirect()->route('home')->with('error', 'Order not found.');
+        } catch (\Exception $e) {
+            Log::error("Error showing order success page: " . $e->getMessage());
+            return redirect()->route('home')->with('error', 'Something went wrong while loading the order success page.');
+        }
     }
 
-    private function getCountries()
-    {
-        return [
-            'IN' => 'INDIA',
-            // Add more countries as needed
-        ];
-    }
+
 }

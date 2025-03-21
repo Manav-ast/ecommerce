@@ -14,7 +14,7 @@ class AdminOrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::latest()->paginate(10);
+        $orders = Order::with('user')->latest()->paginate(10);
         return view('admin.orders.index', compact('orders'));
     }
 
@@ -127,7 +127,7 @@ class AdminOrderController extends Controller
     public function details($id)
     {
         try {
-            // Fetch order with related data
+            // Fetch order with related data (using explicit eager loading despite model defaults)
             $order = Order::with(['orderItems.product', 'payment', 'user.addresses'])->find($id);
 
             if (!$order) {
@@ -144,6 +144,37 @@ class AdminOrderController extends Controller
         } catch (\Exception $e) {
             Log::error("Error fetching order details: " . $e->getMessage());
             return response()->json(['error' => 'Something went wrong while fetching order details.'], 500);
+        }
+    }
+
+    /**
+     * Update the order status.
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            // Validate the request
+            $request->validate([
+                'order_status' => 'required|string|in:pending,shipped,delivered,cancelled',
+            ]);
+
+            // Find the order
+            $order = Order::findOrFail($id);
+
+            // Update the order status
+            $oldStatus = $order->order_status;
+            $order->order_status = $request->order_status;
+            $order->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order status updated successfully',
+                'old_status' => $oldStatus,
+                'new_status' => $order->order_status
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error updating order status: " . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong while updating order status.'], 500);
         }
     }
 }

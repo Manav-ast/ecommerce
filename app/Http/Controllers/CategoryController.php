@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class CategoryController extends Controller
 {
@@ -12,8 +14,13 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all(); // Fetch all categories
-        return view('pages.home', compact('categories')); // Pass data to the view
+        try {
+            $categories = Category::all(); // Fetch all categories
+            return view('pages.home', compact('categories')); // Pass data to the view
+        } catch (\Exception $e) {
+            Log::error("Error fetching categories: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while fetching categories.');
+        }
     }
 
     /**
