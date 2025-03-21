@@ -52,39 +52,43 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-xl font-semibold text-gray-800">Confirm Deletion</h2>
-        <p class="text-gray-600 mt-2" id="deleteMessage"></p>
-
-        <!-- Form -->
-        <form id="deleteForm" method="POST">
-            @csrf
-            @method('DELETE')
-            <div class="mt-4 flex justify-end space-x-2">
-                <button type="button" onclick="closeDeleteModal()"
-                    class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-                    Cancel
-                </button>
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                    Delete
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- JavaScript for Delete Confirmation Modal & AJAX Search -->
+<!-- JavaScript for SweetAlert2 Delete Confirmation & AJAX Search -->
 <script>
     function openDeleteModal(roleId, roleName) {
-        document.getElementById("deleteForm").action = "{{ url('/admin/roles') }}/" + roleId;
-        document.getElementById("deleteMessage").textContent = "Are you sure you want to delete '" + roleName + "'?";
-        document.getElementById("deleteModal").classList.remove("hidden");
-    }
-
-    function closeDeleteModal() {
-        document.getElementById("deleteModal").classList.add("hidden");
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to delete '" + roleName + "'. This cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Create form element
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ url('/admin/roles') }}/" + roleId;
+                
+                // Add CSRF token
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                // Add method field
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+                form.appendChild(methodField);
+                
+                // Append form to body and submit
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     // AJAX Search Functionality

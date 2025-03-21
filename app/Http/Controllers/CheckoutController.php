@@ -11,6 +11,7 @@ use App\Models\Address;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -99,7 +100,7 @@ class CheckoutController extends Controller
             ]);
             
             // Log successful order creation for debugging
-            \Illuminate\Support\Facades\Log::info('Order created successfully', [
+            Log::info('Order created successfully', [
                 'order_id' => $order->id,
                 'user_id' => Auth::id(),
                 'total_price' => $totalPrice
