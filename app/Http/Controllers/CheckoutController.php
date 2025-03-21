@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CheckoutRequest;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -10,7 +11,6 @@ use App\Models\Address;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
@@ -40,28 +40,9 @@ class CheckoutController extends Controller
         return view('pages.checkout', compact('cart', 'cartTotal', 'countries'));
     }
 
-    public function store(Request $request)
+    public function store(CheckoutRequest $request)
     {
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'region' => 'required|string|max:100',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal' => 'required|string|max:20',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:100',
-            'payment_method' => 'required|in:credit_card,paypal',
-        ]);
-
-        // dd($validator);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        // Request is automatically validated by the CheckoutRequest class
 
         // Get cart from session
         $cart = $this->cartService->getCart();
@@ -109,11 +90,19 @@ class CheckoutController extends Controller
             Address::create([
                 'user_id' => Auth::id(),
                 'address_line1' => $request->address,
+                'address_line2' => $request->address_line2,
                 'city' => $request->city,
-                'state' => '', // You might want to add state field to your form
+                'state' => $request->state ?? '', // Use state if provided, otherwise empty string
                 'postal_code' => $request->postal,
                 'country' => $request->region,
-                'type' => 'billing',
+                'type' => $request->address_type, // Use the selected address type from the form
+            ]);
+            
+            // Log successful order creation for debugging
+            \Illuminate\Support\Facades\Log::info('Order created successfully', [
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'total_price' => $totalPrice
             ]);
 
             // Clear cart

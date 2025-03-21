@@ -10,19 +10,19 @@
 
             <!-- Address Type Selection -->
             <div class="mb-6">
-                <label class="block text-gray-600 mb-2">Address Type <span class="text-red-500"
+                <label class="block text-gray-600 mb-2">Address Type <span class="text-blue-500"
                         aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                 <div class="flex items-center gap-6">
                     <label class="flex items-center cursor-pointer">
                         <input type="radio" name="address_type" value="billing"
-                            class="mr-2 focus:ring-2 focus:ring-primary"
+                            class="mr-2 focus:ring-2 focus:ring-blue-500"
                             {{ old('address_type', 'billing') == 'billing' ? 'checked' : '' }} required
                             aria-required="true">
                         <span class="text-gray-700">Billing Address</span>
                     </label>
                     <label class="flex items-center cursor-pointer">
                         <input type="radio" name="address_type" value="shipping"
-                            class="mr-2 focus:ring-2 focus:ring-primary"
+                            class="mr-2 focus:ring-2 focus:ring-blue-500"
                             {{ old('address_type') == 'shipping' ? 'checked' : '' }}>
                         <span class="text-gray-700">Shipping Address</span>
                     </label>
@@ -38,12 +38,22 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="first-name" class="block text-gray-600 mb-1">First Name <span class="text-red-500"
+                        <label for="first-name" class="block text-gray-600 mb-1">First Name <span class="text-blue-500"
                                 aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                         <input type="text" name="first_name" id="first-name" class="input-box w-full"
                             value="{{ old('first_name', Auth::user()->name ?? '') }}" required aria-required="true"
                             placeholder="John">
                         @error('first_name')
+                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="last-name" class="block text-gray-600 mb-1">Last Name <span class="text-blue-500"
+                                aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                        <input type="text" name="last_name" id="last-name" class="input-box w-full"
+                            value="{{ old('last_name') }}" required aria-required="true"
+                            placeholder="Doe">
+                        @error('last_name')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
@@ -57,7 +67,7 @@
                 </div>
 
                 <div>
-                    <label for="region" class="block text-gray-600 mb-1">Country/Region <span class="text-red-500"
+                    <label for="region" class="block text-gray-600 mb-1">Country/Region <span class="text-blue-500"
                             aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                     <select name="region" id="region" class="input-box w-full" required aria-required="true">
                         <option value="">Select a country</option>
@@ -72,7 +82,7 @@
                 </div>
 
                 <div>
-                    <label for="address" class="block text-gray-600 mb-1">Street Address <span class="text-red-500"
+                    <label for="address" class="block text-gray-600 mb-1">Street Address <span class="text-blue-500"
                             aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                     <input type="text" name="address" id="address" class="input-box w-full"
                         value="{{ old('address') }}" required aria-required="true" placeholder="123 Main St">
@@ -81,9 +91,19 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label for="address_line2" class="block text-gray-600 mb-1">Apartment, suite, etc. <span
+                            class="text-gray-400">(optional)</span></label>
+                    <input type="text" name="address_line2" id="address_line2" class="input-box w-full"
+                        value="{{ old('address_line2') }}" placeholder="Apartment, suite, unit, etc.">
+                    @error('address_line2')
+                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="city" class="block text-gray-600 mb-1">City <span class="text-red-500"
+                        <label for="city" class="block text-gray-600 mb-1">City <span class="text-blue-500"
                                 aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                         <input type="text" name="city" id="city" class="input-box w-full"
                             value="{{ old('city') }}" required aria-required="true" placeholder="New York">
@@ -92,7 +112,19 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="postal" class="block text-gray-600 mb-1">Postal Code <span class="text-red-500"
+                        <label for="state" class="block text-gray-600 mb-1">State/Province <span
+                                class="text-gray-400">(optional)</span></label>
+                        <input type="text" name="state" id="state" class="input-box w-full"
+                            value="{{ old('state') }}" placeholder="NY">
+                        @error('state')
+                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="postal" class="block text-gray-600 mb-1">Postal Code <span class="text-blue-500"
                                 aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                         <input type="text" name="postal" id="postal" class="input-box w-full"
                             value="{{ old('postal') }}" required aria-required="true" placeholder="10001">
@@ -104,17 +136,17 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="phone" class="block text-gray-600 mb-1">Phone Number <span class="text-red-500"
+                        <label for="phone" class="block text-gray-600 mb-1">Phone Number <span class="text-blue-500"
                                 aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                         <input type="tel" name="phone" id="phone" class="input-box w-full"
                             value="{{ old('phone', Auth::user()->phone_no ?? '') }}" required aria-required="true"
-                            placeholder="+1 (555) 123-4567">
+                            placeholder="1010901080">
                         @error('phone')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label for="email" class="block text-gray-600 mb-1">Email Address <span class="text-red-500"
+                        <label for="email" class="block text-gray-600 mb-1">Email Address <span class="text-blue-500"
                                 aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                         <input type="email" name="email" id="email" class="input-box w-full"
                             value="{{ old('email', Auth::user()->email ?? '') }}" required aria-required="true"
@@ -133,14 +165,14 @@
                     <div class="flex items-center gap-6">
                         <label class="flex items-center cursor-pointer">
                             <input type="radio" name="payment_method" value="credit_card"
-                                class="mr-2 focus:ring-2 focus:ring-primary"
+                                class="mr-2 focus:ring-2 focus:ring-blue-500"
                                 {{ old('payment_method') == 'credit_card' ? 'checked' : '' }} required
                                 aria-required="true">
                             <span class="text-gray-700">Credit Card</span>
                         </label>
                         <label class="flex items-center cursor-pointer">
                             <input type="radio" name="payment_method" value="paypal"
-                                class="mr-2 focus:ring-2 focus:ring-primary"
+                                class="mr-2 focus:ring-2 focus:ring-blue-500"
                                 {{ old('payment_method') == 'paypal' ? 'checked' : '' }}>
                             <span class="text-gray-700">PayPal</span>
                         </label>
@@ -154,11 +186,11 @@
             <!-- Terms and Conditions -->
             <div class="mt-8">
                 <label class="flex items-center cursor-pointer">
-                    <input type="checkbox" name="agreement" id="agreement" class="mr-2 focus:ring-2 focus:ring-primary"
+                    <input type="checkbox" name="agreement" id="agreement" class="mr-2 focus:ring-2 focus:ring-blue-500"
                         required aria-required="true">
                     <span class="text-gray-700">I agree to the <a href="#"
-                            class="text-primary hover:underline">Terms and Conditions</a> and <a href="#"
-                            class="text-primary hover:underline">Privacy Policy</a></span>
+                            class="text-blue-500 hover:underline">Terms and Conditions</a> and <a href="#"
+                            class="text-blue-500 hover:underline">Privacy Policy</a></span>
                 </label>
                 @error('agreement')
                     <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
@@ -176,7 +208,7 @@
                         <div>
                             <h5 class="text-gray-800 font-medium">{{ $item['name'] }}</h5>
                         </div>
-                        <p class="text-gray-600">×{{ $item['quantity'] }}</p>
+                        <p class="text-gray-600">X {{ $item['quantity'] }}</p>
                         <p class="text-gray-800 font-medium">${{ number_format($item['price'] * $item['quantity'], 2) }}
                         </p>
                     </div>
@@ -199,7 +231,7 @@
             </div>
 
             <button type="submit" form="checkout-form"
-                class="block w-full py-3 px-4 mt-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-primary-dark focus:ring-2 focus:ring-primary focus:outline-none transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                class="block w-full py-3 px-4 mt-4 text-center text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
                 aria-label="Place your order">
                 Place Order
             </button>
@@ -210,7 +242,7 @@
 @push('styles')
     <style>
         .input-box {
-            @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition;
+            @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition;
         }
 
         .input-box:invalid {

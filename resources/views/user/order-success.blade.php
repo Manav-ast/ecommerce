@@ -49,7 +49,7 @@
 
                 <div class="mt-8 space-y-3">
                     <a href="{{ route('home') }}"
-                        class="block w-full py-2 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary transition">
+                        class="block w-full py-2 px-4 text-center text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                         Continue Shopping
                     </a>
                     {{-- <a href="{{ route('profile.orders') }}"
