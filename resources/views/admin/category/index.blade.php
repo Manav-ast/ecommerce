@@ -86,6 +86,11 @@
     <!-- JavaScript for Search & Delete Confirmation Modal -->
     <script>
         $(document).ready(function() {
+            // Display flash messages on page load
+            if (typeof successMessage !== 'undefined' && successMessage) {
+                showSuccessToast(successMessage);
+            }
+
             $("#searchInput").on("keyup", function() {
                 let query = $(this).val().trim(); // Remove extra spaces
 
@@ -106,9 +111,43 @@
             });
         });
 
-        function openDeleteModal(categorySlug) {
-            document.getElementById("deleteForm").action = "/admin/categories/" + categorySlug;
+        function openDeleteModal(categoryId) {
+            document.getElementById("deleteForm").action = "/admin/categories/" + categoryId;
             document.getElementById("deleteModal").classList.remove("hidden");
+
+            // Set up AJAX form submission for delete
+            $("#deleteForm").off('submit').on('submit', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'DELETE',
+                    data: $(this).serialize(),
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(data) {
+                        // Close modal
+                        closeDeleteModal();
+
+                        // Show success toast
+                        showSuccessToast('Category deleted successfully!');
+
+                        // Reload page after a short delay
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr, status, error) {
+                        // Close modal
+                        closeDeleteModal();
+
+                        // Show error toast
+                        showErrorToast('Error deleting category. Please try again.');
+                        console.error(error);
+                    }
+                });
+            });
         }
 
         function closeDeleteModal() {

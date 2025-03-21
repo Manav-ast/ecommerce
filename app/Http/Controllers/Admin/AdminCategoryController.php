@@ -35,7 +35,7 @@ class AdminCategoryController extends Controller
     {
         try {
             $validated = $request->validated();
-            
+
             // Handle Image Upload
             $imagePath = $request->file('image')->store('category_images', 'public');
 
@@ -81,7 +81,11 @@ class AdminCategoryController extends Controller
 
             $category->update($validated);
 
-            return redirect()->route('admin.categories')->with('success', 'Category updated successfully!');
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Category updated successfully!']);
+            } else {
+                return redirect()->route('admin.categories')->with('success', 'Category updated successfully!');
+            }
         } catch (\Exception $e) {
             Log::error("Error updating category: " . $e->getMessage());
             return back()->with('error', 'Something went wrong while updating the category.');
@@ -104,7 +108,11 @@ class AdminCategoryController extends Controller
 
             $category->delete();
 
-            return redirect()->route('admin.categories')->with('success', 'Category deleted successfully!');
+            if (request()->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Category deleted successfully!']);
+            } else {
+                return redirect()->route('admin.categories')->with('success', 'Category deleted successfully!');
+            }
         } catch (\Exception $e) {
             Log::error("Error deleting category: " . $e->getMessage());
             return back()->with('error', 'Something went wrong while deleting the category.');

@@ -80,10 +80,6 @@
                     class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
                     Add Product
                 </button>
-
-                <!-- Success Message -->
-                <p id="successMessage" class="text-green-600 font-semibold text-center hidden mt-2">Product added
-                    successfully!</p>
             </form>
         </div>
     </div>
@@ -193,7 +189,8 @@
                         },
                         success: function(data) {
                             if (data.success) {
-                                $('#successMessage').removeClass('hidden');
+                                // Show success toast notification
+                                showSuccessToast(data.message);
 
                                 // Reset form after success
                                 setTimeout(function() {
@@ -207,11 +204,16 @@
                                         'hidden');
                                 });
                             } else {
-                                alert('Error: ' + data.message);
+                                // Show error toast notification
+                                showErrorToast(data.message ||
+                                    'An error occurred while adding the product.');
                             }
                         },
                         error: function(xhr, status, error) {
                             console.error('Error:', error);
+                            // Show error toast notification
+                            showErrorToast(
+                                'An error occurred while processing your request.');
                         }
                     });
                 }

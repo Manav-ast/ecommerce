@@ -188,10 +188,15 @@
                     name = name.replace('[]', '');
                     $("#error-" + name).html(error.text()).removeClass('hidden');
                 },
-                // Preserve the original form submission behavior instead of using AJAX
-                // This approach is safer and will use Laravel's built-in validation and redirect
+                // Submit the form with loading state and toast notifications
                 submitHandler: function(form) {
-                    form.submit(); // Submit the form normally
+                    // Show loading state
+                    $("button[type='submit']").prop('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
+                    );
+
+                    // Submit the form normally - toast notifications will be handled by Laravel flash messages
+                    form.submit();
                     return true;
                 }
             });

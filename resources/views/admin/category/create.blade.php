@@ -149,7 +149,8 @@
                         },
                         success: function(data) {
                             if (data.success) {
-                                $('#successMessage').removeClass('hidden');
+                                // Show success toast notification
+                                showSuccessToast(data.message);
 
                                 // Reset form after success
                                 setTimeout(function() {
@@ -163,11 +164,16 @@
                                         'hidden');
                                 });
                             } else {
-                                alert('Error: ' + data.message);
+                                // Show error toast notification
+                                showErrorToast(data.message ||
+                                    'An error occurred while adding the category.');
                             }
                         },
                         error: function(xhr, status, error) {
                             console.error('Error:', error);
+                            // Show error toast notification
+                            showErrorToast(
+                                'An error occurred while processing your request.');
                         }
                     });
                 }

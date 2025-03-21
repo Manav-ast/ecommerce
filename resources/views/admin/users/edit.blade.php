@@ -14,7 +14,7 @@
                 <!-- User Name -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Name</label>
-                    <input type="text" name="name" id="name"  value="{{ old('name', $user->name) }}"
+                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter user's name">
                     @error('name')
@@ -25,7 +25,7 @@
                 <!-- Email -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Email</label>
-                    <input type="email" name="email" id="email"  value="{{ old('email', $user->email) }}"
+                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter user's email">
                     @error('email')
@@ -36,8 +36,7 @@
                 <!-- Phone Number -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Phone Number</label>
-                    <input type="text" name="phone_no" id="phone_no" 
-                        value="{{ old('phone_no', $user->phone_no) }}"
+                    <input type="text" name="phone_no" id="phone_no" value="{{ old('phone_no', $user->phone_no) }}"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter 10-digit phone number">
                     @error('phone_no')
@@ -67,7 +66,7 @@
                 <!-- Status -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Status</label>
-                    <select name="status" id="status" 
+                    <select name="status" id="status"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>Active
                         </option>
@@ -93,6 +92,7 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Form validation
             $("#editUserForm").validate({
                 rules: {
                     name: {
@@ -147,7 +147,15 @@
                     }
                 },
                 errorElement: "span",
-                errorClass: "text-red-500 text-sm"
+                errorClass: "text-red-500 text-sm",
+                submitHandler: function(form) {
+                    // Show loading state or disable button if needed
+                    $("button[type='submit']").prop('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
+                        );
+
+                    form.submit();
+                }
             });
         });
     </script>
