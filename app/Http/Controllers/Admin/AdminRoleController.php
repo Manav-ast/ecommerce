@@ -14,7 +14,7 @@ class AdminRoleController extends Controller
     public function index()
     {
         try {
-            $roles = Roles::all();
+            $roles = Roles::latest()->paginate(10);
             return view('admin.roles.index', compact('roles'));
         } catch (\Exception $e) {
             Log::error("Error fetching roles: " . $e->getMessage());

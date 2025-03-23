@@ -16,7 +16,7 @@ class AdminProductController extends Controller
     public function index()
     {
         try {
-            $products = Product::with('categories')->get(); // Load categories with products
+            $products = Product::with('categories')->latest()->paginate(10);; // Load categories with products
             return view('admin.products.index', compact('products'));
         } catch (\Exception $e) {
             Log::error("Error fetching products: " . $e->getMessage());

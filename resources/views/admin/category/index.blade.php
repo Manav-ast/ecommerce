@@ -47,7 +47,7 @@
                                     <i class="uil uil-edit"></i>
                                 </a>
 
-                                <!-- Delete Button (Triggers Modal) -->
+                                <!-- Delete Button (Triggers SweetAlert2) -->
                                 <button type="button" onclick="openDeleteModal({{ $category->id }})"
                                     class="text-red-500 hover:text-red-700 transition">
                                     <i class="uil uil-trash-alt"></i>
@@ -58,30 +58,14 @@
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 class="text-xl font-semibold text-gray-800">Confirm Deletion</h2>
-            <p class="text-gray-600 mt-2">Are you sure you want to delete this category?</p>
-
-            <!-- Form -->
-            <form id="deleteForm" method="POST">
-                @csrf
-                @method('DELETE')
-                <div class="mt-4 flex justify-end space-x-2">
-                    <button type="button" onclick="closeDeleteModal()"
-                        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-                        Cancel
-                    </button>
-                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                        Delete
-                    </button>
-                </div>
-            </form>
+        <!-- Pagination Links -->
+        <div class="mt-6">
+            {{ $categories->links() }}
         </div>
     </div>
+
+    <!-- SweetAlert2 is loaded in the dashboard layout -->
 
     <!-- JavaScript for Search & Delete Confirmation Modal -->
     <script>
@@ -112,46 +96,41 @@
         });
 
         function openDeleteModal(categoryId) {
-            document.getElementById("deleteForm").action = "/admin/categories/" + categoryId;
-            document.getElementById("deleteModal").classList.remove("hidden");
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are about to delete this category. This cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send AJAX request to delete the category
+                    $.ajax({
+                        url: "/admin/categories/" + categoryId,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            // Show success toast message instead of modal
+                            showSuccessToast('Category has been deleted successfully!');
 
-            // Set up AJAX form submission for delete
-            $("#deleteForm").off('submit').on('submit', function(e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'DELETE',
-                    data: $(this).serialize(),
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(data) {
-                        // Close modal
-                        closeDeleteModal();
-
-                        // Show success toast
-                        showSuccessToast('Category deleted successfully!');
-
-                        // Reload page after a short delay
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1000);
-                    },
-                    error: function(xhr, status, error) {
-                        // Close modal
-                        closeDeleteModal();
-
-                        // Show error toast
-                        showErrorToast('Error deleting category. Please try again.');
-                        console.error(error);
-                    }
-                });
+                            // Remove the deleted row from the table
+                            setTimeout(function() {
+                                // Reload the page or remove the row from DOM
+                                window.location.reload();
+                            }, 1000);
+                        },
+                        error: function(xhr, status, error) {
+                            // Show error toast message
+                            showErrorToast('There was a problem deleting the category.');
+                            console.error(error);
+                        }
+                    });
+                }
             });
-        }
-
-        function closeDeleteModal() {
-            document.getElementById("deleteModal").classList.add("hidden");
         }
     </script>
 @endsection
