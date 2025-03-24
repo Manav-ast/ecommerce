@@ -70,7 +70,7 @@
                 </tbody>
             </table>
         </div>
-
+        
         <!-- Pagination -->
         <div class="mt-4">
             {{ $orders->links() }}

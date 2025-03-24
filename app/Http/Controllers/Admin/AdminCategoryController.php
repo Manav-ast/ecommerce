@@ -16,7 +16,7 @@ class AdminCategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::latest()->paginate(10); // Fetch all categories paginated
+            $categories = Category::latest()->paginate(5); // Fetch all categories paginated
             return view('admin.category.index', compact('categories'));
         } catch (\Exception $e) {
             Log::error("Error fetching categories: " . $e->getMessage());

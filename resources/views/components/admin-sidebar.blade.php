@@ -67,14 +67,22 @@
     <div class="mt-auto pt-4">
         <hr class="mb-2">
         <ul>
-            {{-- <li>
-                <a href="{{ route('admin.settings') }}" 
+            <li>
+                <a href="" 
                     class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
                     {{ request()->is('setting') ? 'bg-blue-500 text-white' : '' }}">
                     <i class="uil uil-setting text-lg"></i>
                     <span class="ml-4">Settings</span>
                 </a>
-            </li> --}}
+            </li>
+            <li>
+                <a href="{{ route('admin.logout') }}" 
+                    class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 transition 
+                    {{ request()->is('Logout') ? 'bg-blue-500 text-white' : '' }}">
+                    <i class="uil uil-signout"></i>
+                    <span class="ml-4">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
 </aside>

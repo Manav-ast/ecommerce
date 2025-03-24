@@ -7,54 +7,12 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\DuplicateCheckController;
-// use App\Http\Controllers\Auth\LoginController;
-// use App\Http\Controllers\Auth\RegisterController;
-// use App\Http\Controllers\HomepageController;
-// use App\Http\Controllers\CategoryController;
-// use App\Http\Controllers\ProductController;
-// use App\Http\Controllers\CartController;
-// use App\Http\Controllers\CheckoutController;
-use App\Models\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminStaticBlockController;
 
-
-//User
-// Route::middleware("guest:user")->group(function () {
-//     Route::get("login", [LoginController::class, "index"])->name("user.login");
-//     Route::post("login", [LoginController::class, "authenticate"])->name("user.authenticate");
-//     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('user.register');
-//     Route::post('/register', [RegisterController::class, 'register']);
-// });
-
-// Route::middleware("auth:user")->group(function () {
-//     Route::get("logout", [LoginController::class, "logout"])->name("user.logout");
-
-//     // Homepage Route
-//     Route::get("/", [HomepageController::class, "index"])->name("home");
-
-//     // Navbar (or Global Categories) Route (Change Path)
-//     Route::get("/categories", [CategoryController::class, "index"])->name("categories.list");
-
-//     // Shop & Products Routes
-//     Route::get("/shop", [ProductController::class, "index"])->name("shop.index");
-//     Route::get('/shop/filter', [ProductController::class, 'filter'])->name('shop.filter');
-//     Route::get("/products/{slug}", [ProductController::class, "show"])->name("shop.show");
-
-//     // Cart Routes
-//     Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');
-//     Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
-//     Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
-//     Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
-
-//     // Checkout Routes
-//     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-//     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-//     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
-// });
 
 @require_once('user.php');
-
 
 //Admin
 Route::prefix("admin")->group(function () {
@@ -65,6 +23,7 @@ Route::prefix("admin")->group(function () {
     });
 
     Route::middleware("auth:admin")->group(function () {
+        //login and logout routes
         Route::get("/", [DashboardController::class, "index"])->name("admin.dashboard");
         Route::get("logout", [AdminLoginController::class, "logout"])->name("admin.logout");
 
@@ -77,6 +36,7 @@ Route::prefix("admin")->group(function () {
         Route::get('categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
         Route::delete('categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
+        //Admin products routes
         Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products');
         Route::get('/products/create', [AdminProductController::class, 'create'])->name('admin.products.create');
         Route::post('/products/store', [AdminProductController::class, 'store'])->name('admin.products.store');
@@ -85,6 +45,7 @@ Route::prefix("admin")->group(function () {
         Route::delete('/products/{id}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::get('/products/search', [AdminProductController::class, 'search'])->name('admin.products.search');
 
+        //Admin orders routes
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders');
         Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('admin.orders.create');
         Route::post('/orders/store', [AdminOrderController::class, 'store'])->name('admin.orders.store');
@@ -95,6 +56,7 @@ Route::prefix("admin")->group(function () {
         Route::get('/orders/details/{id}', [AdminOrderController::class, 'details'])->name('admin.orders.details');
         Route::post('/orders/update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
+        //Admin users routes
         Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users');
         Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
         Route::post('/users/store', [AdminUserController::class, 'store'])->name('admin.users.store');
@@ -105,6 +67,7 @@ Route::prefix("admin")->group(function () {
         Route::post('users/check-email', [DuplicateCheckController::class, 'checkEmail']);
         Route::post('users/check-phone', [DuplicateCheckController::class, 'checkPhone']);
 
+        //Admin roles routes
         Route::get('/roles', [AdminRoleController::class, 'index'])->name('admin.roles.index');
         Route::get('/roles/create', [AdminRoleController::class, 'create'])->name('admin.roles.create');
         Route::post('/roles/store', [AdminRoleController::class, 'store'])->name('admin.roles.store');
@@ -112,5 +75,14 @@ Route::prefix("admin")->group(function () {
         Route::put('/roles/update/{id}', [AdminRoleController::class, 'update'])->name('admin.roles.update');
         Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('admin.roles.destroy');
         Route::get('/roles/search', [AdminRoleController::class, 'search'])->name('admin.roles.search');
+
+        //Admin static blocks routes
+        Route::get('/static-blocks', [AdminStaticBlockController::class, 'index'])->name('admin.static_blocks.index');
+        Route::get('/static-blocks/create', [AdminStaticBlockController::class, 'create'])->name('admin.static_blocks.create');
+        Route::post('/static-blocks/store', [AdminStaticBlockController::class, 'store'])->name('admin.static_blocks.store');
+        Route::get('/static-blocks/edit/{id}', [AdminStaticBlockController::class, 'edit'])->name('admin.static_blocks.edit');
+        Route::put('/static-blocks/update/{id}', [AdminStaticBlockController::class, 'update'])->name('admin.static_blocks.update');
+        Route::delete('/static-blocks/{id}', [AdminStaticBlockController::class, 'destroy'])->name('admin.static_blocks.destroy');
+        Route::get('/static-blocks/search', [AdminStaticBlockController::class, 'search'])->name('admin.static_blocks.search');
     });
 });

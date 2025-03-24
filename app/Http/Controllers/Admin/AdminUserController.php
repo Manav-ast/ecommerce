@@ -16,7 +16,7 @@ class AdminUserController extends Controller
     public function index()
     {
         try {
-            $users = User::latest()->paginate(10);
+            $users = User::latest()->paginate(5);
             return view('admin.users.index', compact('users'));
         } catch (\Exception $e) {
             Log::error("Error fetching users: " . $e->getMessage());

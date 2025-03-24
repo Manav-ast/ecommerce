@@ -14,7 +14,7 @@ class AdminOrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with('user')->latest()->paginate(10);
+        $orders = Order::with('user')->latest()->paginate(8);
         return view('admin.orders.index', compact('orders'));
     }
 
