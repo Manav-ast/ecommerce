@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Auth\DuplicateCheckController;
 
 
 
@@ -16,6 +17,9 @@ Route::middleware("guest:user")->group(function () {
     Route::post("login", [LoginController::class, "authenticate"])->name("user.authenticate");
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('user.register');
     Route::post('/register', [RegisterController::class, 'register']);
+
+    Route::post('/check-email', [DuplicateCheckController::class, 'checkEmail']);
+    Route::post('/check-phone', [DuplicateCheckController::class, 'checkPhone']);
 });
 
 

@@ -22,7 +22,7 @@ class RegisterController extends Controller
     public function showRegistrationForm()
     {
         try {
-            return view('pages.auth.register');
+            return view('auth.user.register');
         } catch (\Exception $e) {
             Log::error("Error loading registration form: " . $e->getMessage());
             return back()->with('error', 'Something went wrong while loading the registration page.');

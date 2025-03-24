@@ -13,7 +13,7 @@
                 <!-- User Name -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Name</label>
-                    <input type="text" name="name" id="name"  value="{{ old('name') }}"
+                    <input type="text" name="name" id="name" value="{{ old('name') }}"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter user's name">
                     @error('name')
@@ -24,7 +24,7 @@
                 <!-- Email -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Email</label>
-                    <input type="email" name="email" id="email"  value="{{ old('email') }}"
+                    <input type="email" name="email" id="email" value="{{ old('email') }}"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter user's email">
                     @error('email')
@@ -35,7 +35,7 @@
                 <!-- Phone Number -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Phone Number</label>
-                    <input type="text" name="phone_no" id="phone_no"  value="{{ old('phone_no') }}"
+                    <input type="text" name="phone_no" id="phone_no" value="{{ old('phone_no') }}"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter 10-digit phone number">
                     @error('phone_no')
@@ -46,7 +46,7 @@
                 <!-- Password -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Password</label>
-                    <input type="password" name="password" id="password" 
+                    <input type="password" name="password" id="password"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter password">
                     @error('password')
@@ -57,7 +57,7 @@
                 <!-- Confirm Password -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Confirm Password</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" 
+                    <input type="password" name="password_confirmation" id="password_confirmation"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Re-enter password">
                 </div>
@@ -65,7 +65,7 @@
                 <!-- Status -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Status</label>
-                    <select name="status" id="status" 
+                    <select name="status" id="status"
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -98,13 +98,33 @@
                     },
                     email: {
                         required: true,
-                        email: true
+                        email: true,
+                        remote: {
+                            url: "/admin/users/check-email",
+                            type: "post",
+                            data: {
+                                email: function() {
+                                    return $("#email").val();
+                                },
+                                _token: "{{ csrf_token() }}"
+                            }
+                        }
                     },
                     phone_no: {
                         required: true,
                         digits: true,
                         minlength: 10,
-                        maxlength: 10
+                        maxlength: 10,
+                        remote: {
+                            url: "/admin/users/check-phone",
+                            type: "post",
+                            data: {
+                                phone_no: function() {
+                                    return $("#phone_no").val();
+                                },
+                                _token: "{{ csrf_token() }}"
+                            }
+                        }
                     },
                     password: {
                         required: true,
@@ -126,13 +146,15 @@
                     },
                     email: {
                         required: "Please enter an email address",
-                        email: "Please enter a valid email address"
+                        email: "Please enter a valid email address",
+                        remote: "This email is already in use"
                     },
                     phone_no: {
                         required: "Please enter a phone number",
                         digits: "Phone number must contain only digits",
                         minlength: "Phone number must be exactly 10 digits",
-                        maxlength: "Phone number must be exactly 10 digits"
+                        maxlength: "Phone number must be exactly 10 digits",
+                        remote: "This phone number is already in use"
                     },
                     password: {
                         required: "Please enter a password",
@@ -147,8 +169,57 @@
                     }
                 },
                 errorElement: "span",
-                errorClass: "text-red-500 text-sm"
+                errorClass: "text-red-500 text-sm",
+                errorPlacement: function(error, element) {
+                    // Custom error placement
+                    error.insertAfter(element);
+                },
+                submitHandler: function(form) {
+                    // AJAX Form Submission using jQuery
+                    let formData = new FormData(form);
+
+                    $.ajax({
+                        url: "{{ route('admin.users.store') }}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            if (data.success) {
+                                // Show success toast notification
+                                showSuccessToast(data.message ||
+                                'User added successfully!');
+
+                                // Reset form after success
+                                setTimeout(function() {
+                                    window.location.href =
+                                        "{{ route('admin.users') }}";
+                                }, 1000);
+                            } else if (data.errors) {
+                                // Show validation errors
+                                $.each(data.errors, function(key, value) {
+                                    $('span[id^="error-' + key + '"]').text(value[
+                                        0]).removeClass('hidden');
+                                });
+                            } else {
+                                // Show error toast notification
+                                showErrorToast(data.message ||
+                                    'An error occurred while adding the user.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                            // Show error toast notification
+                            showErrorToast(
+                                'An error occurred while processing your request.');
+                        }
+                    });
+                }
             });
+        }
         });
     </script>
 @endpush

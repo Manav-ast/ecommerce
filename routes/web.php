@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Auth\DuplicateCheckController;
 // use App\Http\Controllers\Auth\LoginController;
 // use App\Http\Controllers\Auth\RegisterController;
 // use App\Http\Controllers\HomepageController;
@@ -16,6 +16,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 // use App\Http\Controllers\CheckoutController;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminCategoryController;
 
 
 //User
@@ -101,6 +102,8 @@ Route::prefix("admin")->group(function () {
         Route::put('/users/update/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
         Route::get('/users/search', [AdminUserController::class, 'search'])->name('admin.users.search');
+        Route::post('users/check-email', [DuplicateCheckController::class, 'checkEmail']);
+        Route::post('users/check-phone', [DuplicateCheckController::class, 'checkPhone']);
 
         Route::get('/roles', [AdminRoleController::class, 'index'])->name('admin.roles.index');
         Route::get('/roles/create', [AdminRoleController::class, 'create'])->name('admin.roles.create');

@@ -25,7 +25,7 @@ class UserRegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:100', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone_no' => ['required', 'string', 'max:20'],
+            'phone_no' => ['required', 'string', 'max:20', 'unique:users,phone_no'],
         ];
     }
 
