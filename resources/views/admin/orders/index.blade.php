@@ -26,8 +26,7 @@
                 </thead>
                 <tbody id="orderTableBody">
                     @foreach ($orders as $order)
-                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition"
-                            data-order-id="{{ $order->id }}">
+                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition" data-order-id="{{ $order->id }}">
                             <td class="px-6 py-3 text-gray-800">{{ $order->id }}</td>
                             <td class="px-6 py-3 text-gray-800">{{ $order->user->name ?? 'Guest' }}</td>
                             <td class="px-6 py-3">
@@ -45,12 +44,26 @@
                             </td>
                             <td class="px-6 py-3 text-gray-600">${{ number_format($order->total_price, 2) }}</td>
                             <td class="px-6 py-3 text-gray-600">{{ date('d M, Y', strtotime($order->order_date)) }}</td>
-                            <td class="px-12 py-3">
+                            <td class="px-12 py-3 flex space-x-4">
                                 <!-- View Button -->
-                                <button type="button" data-order-id="{{ $order->id }}"
-                                    class="view-order-btn text-green-500 hover:text-green-700 transition">
+                                <button type="button" onclick="openViewModal({{ $order->id }})"
+                                    class="text-green-500 hover:text-green-700 transition">
                                     <i class="uil uil-eye"></i>
                                 </button>
+
+
+                                <!-- Edit Button -->
+                                {{-- <a href="{{ route('admin.orders.edit', $order->id) }}"
+                                    class="text-blue-500 hover:text-blue-700 transition">
+                                    <i class="uil uil-edit"></i>
+                                </a>
+
+                                <!-- Delete Button -->
+                                <button type="button"
+                                    onclick="openDeleteModal({{ $order->id }}, 'Order #{{ $order->id }}')"
+                                    class="text-red-500 hover:text-red-700 transition">
+                                    <i class="uil uil-trash-alt"></i>
+                                </button> --}}
                             </td>
                         </tr>
                     @endforeach
@@ -63,7 +76,7 @@
             {{ $orders->links() }}
         </div>
     </div>
-
+    
     <!-- View Order Details Modal -->
     <div id="viewOrderModal" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl">
@@ -78,8 +91,8 @@
     </div>
 
 
-    {{-- <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
+    <!-- Delete Confirmation Modal -->
+    {{-- <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 class="text-xl font-semibold text-gray-800">Confirm Deletion</h2>
             <p class="text-gray-600 mt-2" id="deleteMessage"></p>
@@ -102,48 +115,44 @@
 
     <!-- JavaScript for Delete & View Order Details -->
     <script>
-        $(document).ready(function() {
-            // View order button click event
-            $(document).on('click', '.view-order-btn', function() {
-                const orderId = $(this).data('order-id');
-
-                $.ajax({
-                    url: "{{ url('/admin/orders/details') }}/" + orderId,
+        function openViewModal(orderId) {
+            fetch("{{ url('/admin/orders/details') }}/" + orderId, {
                     method: "GET",
                     headers: {
                         "X-Requested-With": "XMLHttpRequest"
-                    },
-                    success: function(data) {
-                        if (data.html) {
-                            $("#orderDetailsContent").html(data.html);
-                            $("#viewOrderModal").removeClass("hidden");
-
-                            // Add event listener to status toggle after modal content is loaded
-                            $("#orderStatusToggle").on('change', function() {
-                                updateOrderStatus($(this).data('order-id'), $(this)
-                                .val());
-                            });
-                        } else {
-                            $("#orderDetailsContent").html(
-                                "<p class='text-red-500'>Order details not found.</p>");
-                            $("#viewOrderModal").removeClass("hidden");
-                        }
-                    },
-                    error: function(error) {
-                        console.error("Ajax error:", error);
-                        $("#orderDetailsContent").html(
-                            "<p class='text-red-500'>Something went wrong.</p>");
-                        $("#viewOrderModal").removeClass("hidden");
                     }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html) {
+                        document.getElementById("orderDetailsContent").innerHTML = data.html;
+                        document.getElementById("viewOrderModal").classList.remove("hidden");
+                        
+                        // Add event listener to status toggle after modal content is loaded
+                        const statusToggle = document.getElementById("orderStatusToggle");
+                        if (statusToggle) {
+                            statusToggle.addEventListener("change", function() {
+                                updateOrderStatus(this.dataset.orderId, this.value);
+                            });
+                        }
+                    } else {
+                        document.getElementById("orderDetailsContent").innerHTML =
+                            "<p class='text-red-500'>Order details not found.</p>";
+                        document.getElementById("viewOrderModal").classList.remove("hidden");
+                    }
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                    document.getElementById("orderDetailsContent").innerHTML =
+                        "<p class='text-red-500'>Something went wrong.</p>";
+                    document.getElementById("viewOrderModal").classList.remove("hidden");
                 });
-            });
+        }
 
-            // Close modal button click event
-            $(document).on('click', '[onclick="closeViewModal()"]', function() {
-                $("#viewOrderModal").addClass("hidden");
-            });
-        });
-
+        function closeViewModal() {
+            document.getElementById("viewOrderModal").classList.add("hidden");
+        }
+        
         function updateOrderStatus(orderId, newStatus) {
             // Show loading indicator
             const Toast = Swal.mixin({
@@ -157,85 +166,84 @@
                     toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             });
-
+            
             // Send AJAX request to update status
-            $.ajax({
-                url: "{{ url('/admin/orders/update-status') }}/" + orderId,
+            fetch("{{ url('/admin/orders/update-status') }}/" + orderId, {
                 method: "POST",
                 headers: {
+                    "Content-Type": "application/json",
                     "X-CSRF-TOKEN": "{{ csrf_token() }}",
                     "X-Requested-With": "XMLHttpRequest"
                 },
-                contentType: "application/json",
-                data: JSON.stringify({
+                body: JSON.stringify({
                     order_status: newStatus
-                }),
-                success: function(data) {
-                    if (data.success) {
-                        // Show success notification
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Order status updated successfully'
-                        });
-
-                        // Update the status badge in the modal
-                        const $statusBadge = $('#orderDetailsContent .rounded-lg.text-white');
-                        if ($statusBadge.length) {
-                            // Remove old status classes
-                            $statusBadge.removeClass('bg-yellow-500 bg-blue-500 bg-green-500 bg-red-500');
-
-                            // Add new status class
-                            if (newStatus === 'pending') {
-                                $statusBadge.addClass('bg-yellow-500');
-                            } else if (newStatus === 'shipped') {
-                                $statusBadge.addClass('bg-blue-500');
-                            } else if (newStatus === 'delivered') {
-                                $statusBadge.addClass('bg-green-500');
-                            } else {
-                                $statusBadge.addClass('bg-red-500');
-                            }
-
-                            // Update text
-                            $statusBadge.text(newStatus.charAt(0).toUpperCase() + newStatus.slice(1));
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success notification
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Order status updated successfully'
+                    });
+                    
+                    // Update the status badge in the modal
+                    const statusBadge = document.querySelector('#orderDetailsContent .rounded-lg.text-white');
+                    if (statusBadge) {
+                        // Remove old status classes
+                        statusBadge.classList.remove('bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-red-500');
+                        
+                        // Add new status class
+                        if (newStatus === 'pending') {
+                            statusBadge.classList.add('bg-yellow-500');
+                        } else if (newStatus === 'shipped') {
+                            statusBadge.classList.add('bg-blue-500');
+                        } else if (newStatus === 'delivered') {
+                            statusBadge.classList.add('bg-green-500');
+                        } else {
+                            statusBadge.classList.add('bg-red-500');
                         }
-
-                        // Also update the status in the main table if the order is visible
-                        const $tableStatusBadge = $("tr[data-order-id='" + orderId +
-                            "'] .rounded-lg.text-white");
-                        if ($tableStatusBadge.length) {
-                            // Remove old status classes
-                            $tableStatusBadge.removeClass('bg-yellow-500 bg-blue-500 bg-green-500 bg-red-500');
-
-                            // Add new status class
-                            if (newStatus === 'pending') {
-                                $tableStatusBadge.addClass('bg-yellow-500');
-                            } else if (newStatus === 'shipped') {
-                                $tableStatusBadge.addClass('bg-blue-500');
-                            } else if (newStatus === 'delivered') {
-                                $tableStatusBadge.addClass('bg-green-500');
-                            } else {
-                                $tableStatusBadge.addClass('bg-red-500');
-                            }
-
-                            // Update text
-                            $tableStatusBadge.text(newStatus.charAt(0).toUpperCase() + newStatus.slice(1));
-                        }
-                    } else {
-                        // Show error notification
-                        Toast.fire({
-                            icon: 'error',
-                            title: data.error || 'Failed to update order status'
-                        });
+                        
+                        // Update text
+                        statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
                     }
-                },
-                error: function(error) {
-                    console.error("Error updating status:", error);
+                    
+                    // Also update the status in the main table if the order is visible
+                    const tableStatusBadge = document.querySelector(`tr[data-order-id="${orderId}"] .rounded-lg.text-white`);
+                    if (tableStatusBadge) {
+                        // Remove old status classes
+                        tableStatusBadge.classList.remove('bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-red-500');
+                        
+                        // Add new status class
+                        if (newStatus === 'pending') {
+                            tableStatusBadge.classList.add('bg-yellow-500');
+                        } else if (newStatus === 'shipped') {
+                            tableStatusBadge.classList.add('bg-blue-500');
+                        } else if (newStatus === 'delivered') {
+                            tableStatusBadge.classList.add('bg-green-500');
+                        } else {
+                            tableStatusBadge.classList.add('bg-red-500');
+                        }
+                        
+                        // Update text
+                        tableStatusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    }
+                } else {
                     // Show error notification
                     Toast.fire({
                         icon: 'error',
-                        title: 'Something went wrong while updating status'
+                        title: data.error || 'Failed to update order status'
                     });
                 }
+            })
+            .catch(error => {
+                console.error("Error updating status:", error);
+                // Show error notification
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Something went wrong while updating status'
+                });
             });
         }
     </script>

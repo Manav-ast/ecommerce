@@ -161,7 +161,7 @@ class AdminOrderController extends Controller
             // Find the order
             $order = Order::findOrFail($id);
 
-            // Update the order status
+            // Update only the order status, not touching payment status
             $oldStatus = $order->order_status;
             $order->order_status = $request->order_status;
             $order->save();

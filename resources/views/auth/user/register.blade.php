@@ -11,7 +11,7 @@
     <div class="max-w-md mx-auto bg-white p-8 mt-10 rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold text-center text-gray-800">Register</h2>
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('user.register') }}">
             @csrf
 
             <!-- Name -->

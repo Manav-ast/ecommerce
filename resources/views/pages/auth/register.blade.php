@@ -19,7 +19,7 @@
         <h2 class="text-lg uppercase font-semibold text-gray-700 text-center">Create an Account</h2>
         <p class="text-gray-500 text-xs text-center mb-2">Register as a new customer</p>
 
-        <form method="POST" action="/register">
+        <form method="POST" action="{{ route('user.register') }}">
             @csrf
             <div class="space-y-2">
                 <div>
@@ -28,7 +28,7 @@
                         class="w-full border border-gray-300 px-3 py-2 rounded-md text-gray-700 text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 placeholder-gray-400"
                         placeholder="John Doe">
                     @error('name')
-                        <span class="text-blue-500 text-xs">{{ $message }}</span>
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
@@ -37,7 +37,7 @@
                         class="w-full border border-gray-300 px-3 py-2 rounded-md text-gray-700 text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 placeholder-gray-400"
                         placeholder="youremail@domain.com">
                     @error('email')
-                        <span class="text-blue-500 text-xs">{{ $message }}</span>
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
@@ -46,7 +46,7 @@
                         class="w-full border border-gray-300 px-3 py-2 rounded-md text-gray-700 text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 placeholder-gray-400"
                         placeholder="Enter your phone number">
                     @error('phone_no')
-                        <span class="text-blue-500 text-xs">{{ $message }}</span>
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
@@ -55,7 +55,7 @@
                         class="w-full border border-gray-300 px-3 py-2 rounded-md text-gray-700 text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 placeholder-gray-400"
                         placeholder="Enter your password">
                     @error('password')
-                        <span class="text-blue-500 text-xs">{{ $message }}</span>
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
