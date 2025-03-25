@@ -114,21 +114,28 @@
             });
         }
 
-        // AJAX Search Functionality
+        // AJAX Search Functionality with Debounce
+        let searchTimer;
         document.getElementById("searchInput").addEventListener("keyup", function() {
-            let query = this.value.trim(); // Remove leading/trailing spaces
+            clearTimeout(searchTimer); // Clear any existing timer
 
-            fetch("{{ route('admin.users.search') }}?q=" + encodeURIComponent(query), {
-                    method: "GET",
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
-                    }
-                })
-                .then(response => response.json()) // Expect JSON response
-                .then(data => {
-                    document.getElementById("userTableBody").innerHTML = data.html; // Inject new table content
-                })
-                .catch(error => console.error("Fetch error:", error));
+            // Set a new timer to delay the search execution
+            searchTimer = setTimeout(() => {
+                let query = this.value.trim(); // Remove leading/trailing spaces
+
+                fetch("{{ route('admin.users.search') }}?q=" + encodeURIComponent(query), {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
+                        }
+                    })
+                    .then(response => response.json()) // Expect JSON response
+                    .then(data => {
+                        document.getElementById("userTableBody").innerHTML = data
+                        .html; // Inject new table content
+                    })
+                    .catch(error => console.error("Fetch error:", error));
+            }, 500); // 500ms debounce delay
         });
     </script>
 @endsection

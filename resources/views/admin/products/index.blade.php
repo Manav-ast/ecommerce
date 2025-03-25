@@ -116,20 +116,27 @@
         }
 
         // AJAX Search Functionality
+        let searchTimer;
         document.getElementById("searchInput").addEventListener("keyup", function() {
-            let query = this.value;
+            clearTimeout(searchTimer); // Clear any existing timer
 
-            fetch("{{ route('admin.products.search') }}?q=" + encodeURIComponent(query), {
-                    method: "GET",
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest" // Tell Laravel it's an AJAX request
-                    }
-                })
-                .then(response => response.json()) // Expect JSON response
-                .then(data => {
-                    document.getElementById("productTableBody").innerHTML = data.html; // Inject HTML response
-                })
-                .catch(error => console.error("Fetch error:", error));
+            searchTimer = setTimeout(() => {
+
+                let query = this.value;
+
+                fetch("{{ route('admin.products.search') }}?q=" + encodeURIComponent(query), {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest" // Tell Laravel it's an AJAX request
+                        }
+                    })
+                    .then(response => response.json()) // Expect JSON response
+                    .then(data => {
+                        document.getElementById("productTableBody").innerHTML = data
+                        .html; // Inject HTML response
+                    })
+                    .catch(error => console.error("Fetch error:", error));
+            }, 500); // 500ms debounce delay
         });
     </script>
 @endsection

@@ -77,6 +77,7 @@ class AdminOrderController extends Controller
                     ->orWhereHas('user', function ($q) use ($query) {
                         $q->where('name', 'LIKE', "%{$query}%");
                     })
+                    ->orWhere('order_status', 'LIKE', "%{$query}%") // Added order status search
                     ->with('user')
                     ->get();
 
@@ -91,7 +92,7 @@ class AdminOrderController extends Controller
                         };
 
                         $output .= '
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition" data-order-id="' . $order->id . '">
                         <td class="px-6 py-3 text-gray-800">' . $order->id . '</td>
                         <td class="px-6 py-3 text-gray-800">' . e(optional($order->user)->name ?? 'Guest') . '</td>
                         <td class="px-6 py-3">
@@ -101,13 +102,11 @@ class AdminOrderController extends Controller
                         </td>
                         <td class="px-6 py-3 text-gray-600">$' . number_format($order->total_price, 2) . '</td>
                         <td class="px-6 py-3 text-gray-600">' . date('d M, Y', strtotime($order->order_date)) . '</td>
-                        <td class="px-6 py-3 flex space-x-4">
-                            <a href="' . route('admin.orders.edit', $order->id) . '" class="text-blue-500 hover:text-blue-700 transition">
-                                <i class="uil uil-edit"></i>
-                            </a>
-                            <button type="button" onclick="openDeleteModal(' . $order->id . ', \'Order #' . $order->id . '\')"
-                                class="text-red-500 hover:text-red-700 transition">
-                                <i class="uil uil-trash-alt"></i>
+                        <td class="px-12 py-3 flex space-x-4">
+                            <!-- View Button -->
+                            <button type="button" onclick="openViewModal(' . $order->id . ')"
+                                class="text-green-500 hover:text-green-700 transition">
+                                <i class="uil uil-eye"></i>
                             </button>
                         </td>
                     </tr>';
@@ -123,6 +122,7 @@ class AdminOrderController extends Controller
             return response()->json(['error' => 'Something went wrong while searching orders.'], 500);
         }
     }
+
 
     public function details($id)
     {

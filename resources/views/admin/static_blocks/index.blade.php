@@ -98,20 +98,25 @@
 
 
         // AJAX Search Functionality
+        let searchTimer;
         document.getElementById("searchInput").addEventListener("keyup", function() {
-            let query = this.value;
+            clearTimeout(searchTimer); // Clear any existing timer
 
-            fetch("{{ route('admin.static_blocks.search') }}?q=" + encodeURIComponent(query), {
-                    method: "GET",
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("staticBlockTableBody").innerHTML = data.html;
-                })
-                .catch(error => console.error("Fetch error:", error));
+            searchTimer = setTimeout(() => {
+                let query = this.value;
+
+                fetch("{{ route('admin.static_blocks.search') }}?q=" + encodeURIComponent(query), {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("staticBlockTableBody").innerHTML = data.html;
+                    })
+                    .catch(error => console.error("Fetch error:", error));
+            }, 500); // 500ms debounce delay
         });
     </script>
 @endsection

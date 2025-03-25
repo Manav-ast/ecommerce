@@ -104,20 +104,49 @@
         }
 
         // AJAX Search Functionality
+        let searchTimer;
         document.getElementById("searchInput").addEventListener("keyup", function() {
-            let query = this.value.trim(); // Remove leading/trailing spaces
+            clearTimeout(searchTimer); // Clear any existing timer
 
-            fetch("{{ route('admin.roles.search') }}?q=" + encodeURIComponent(query), {
-                    method: "GET",
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
-                    }
-                })
-                .then(response => response.json()) // Expect JSON response
-                .then(data => {
-                    document.getElementById("roleTableBody").innerHTML = data.html; // Inject new table content
-                })
-                .catch(error => console.error("Fetch error:", error));
+            searchTimer = setTimeout(() => {
+                let query = this.value.trim(); // Remove leading/trailing spaces
+
+                fetch("{{ route('admin.roles.search') }}?q=" + encodeURIComponent(query), {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
+                        }
+                    })
+                    .then(response => response.json()) // Expect JSON response
+                    .then(data => {
+                        document.getElementById("roleTableBody").innerHTML = data
+                        .html; // Inject new table content
+                    })
+                    .catch(error => console.error("Fetch error:", error));
+            }, 500); // 500ms debounce delay
         });
+
+
+        // document.getElementById("searchInput").addEventListener("keyup", function() {
+        //     clearTimeout(searchTimer); // Clear any existing timer
+
+        //     // Set a new timer to delay the search execution
+        //     searchTimer = setTimeout(() => {
+        //         let query = this.value.trim(); // Remove leading/trailing spaces
+
+        //         fetch("{{ route('admin.users.search') }}?q=" + encodeURIComponent(query), {
+        //                 method: "GET",
+        //                 headers: {
+        //                     "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
+        //                 }
+        //             })
+        //             .then(response => response.json()) // Expect JSON response
+        //             .then(data => {
+        //                 document.getElementById("userTableBody").innerHTML = data
+        //                 .html; // Inject new table content
+        //             })
+        //             .catch(error => console.error("Fetch error:", error));
+        //     }, 500); // 500ms debounce delay
+        // });
     </script>
 @endsection
