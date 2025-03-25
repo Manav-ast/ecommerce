@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @stack('styles')
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 </head>
 
 <body>
@@ -23,14 +25,15 @@
     <x-users.navbar />
     <main>
         @if (request()->routeIs('homepage'))
-            <x-users.homepage-banner />
+            <x-users.homepage-banner :banner="getHomeBanner()" />
         @endif
         @yield('content')
         @if (request()->routeIs('homepage'))
             <x-users.homepage-features />
         @endif
     </main>
-    <x-users.footer />
+    {{-- @dd($footerBlock) --}}
+    <x-users.footer :footerBlock="getFooterBlock()" :footerLinks="getFooterLinks()" />
     <x-users.copy-right />
 
     @stack('scripts')

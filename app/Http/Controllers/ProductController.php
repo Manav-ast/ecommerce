@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Facades\Log;
+use App\Models\StaticBlock;
 
 class ProductController extends Controller
 {
@@ -14,8 +15,10 @@ class ProductController extends Controller
         try {
             $categories = Category::withCount('products')->get(); // ✅ This will add 'products_count' to each category
             $products = Product::paginate(12); // ✅ Paginate products
+            $footerBlock = StaticBlock::where('slug', 'footer-test')->where('status', 'active')->first();
+            $footerLinks = StaticBlock::where('slug', 'footer-link')->where('status', 'active')->first();
 
-            return view('user.shop.index', compact('categories', 'products'));
+            return view('user.shop.index', compact('categories', 'products', 'footerBlock', 'footerLinks'  ));
         } catch (\Exception $e) {
             Log::error("Error fetching products and categories: " . $e->getMessage());
             return back()->with('error', 'Something went wrong while loading products.');

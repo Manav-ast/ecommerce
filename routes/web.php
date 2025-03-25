@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminStaticBlockController;
 use App\Http\Controllers\HomepageController;
 
-@require_once('user.php');
+@require('user.php');
 
 //Admin
 Route::prefix("admin")->group(function () {

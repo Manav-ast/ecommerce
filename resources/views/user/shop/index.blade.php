@@ -1,5 +1,5 @@
 @extends('layouts.users.app')
-
+@props(['footerBlock', 'footerLinks'])
 @section('content')
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-[280px,1fr] gap-8">

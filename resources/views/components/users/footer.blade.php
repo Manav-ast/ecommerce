@@ -1,15 +1,22 @@
+@props(['footerBlock', 'footerLinks'])
 <footer class="bg-white pt-16 pb-12 border-t border-gray-100">
     <div class="container grid grid-cols-1 ">
         <div class="col-span-1 space-y-4">
             <img src="assets/images/logo.svg" alt="logo" class="w-30">
             <div class="mr-2">
                 <p class="text-gray-500">
-                    
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, hic?
+
+                    {{-- @dd($footerBlock) --}}
+                    @if (!empty($footerBlock))
+                        {!! $footerBlock->content !!}
+                    @else
+                        <p>Test</p>
+                    @endif
+                    {{-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, hic? --}}
                 </p>
             </div>
             <div class="flex space-x-5">
-                <a href="#" class="text-gray-400 hover:text-gray-500"><i
+                {{-- <a href="#" class="text-gray-400 hover:text-gray-500"><i
                         class="fa-brands fa-facebook-square"></i></a>
                 <a href="#" class="text-gray-400 hover:text-gray-500"><i
                         class="fa-brands fa-instagram-square"></i></a>
@@ -17,11 +24,16 @@
                         class="fa-brands fa-twitter-square"></i></a>
                 <a href="#" class="text-gray-400 hover:text-gray-500">
                     <i class="fa-brands fa-github-square"></i>
-                </a>
+                </a> --}}
+                @if (!empty($footerLinks))
+                    {!! $footerLinks->content !!}
+                @else
+                    <p>Default Links</p>
+                @endif
             </div>
         </div>
 
-        <div class="col-span-2 grid grid-cols-2 gap-4">
+        {{-- <div class="col-span-2 grid grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-4 md:gap-8">
                 <div>
                     <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Solutions</h3>
@@ -64,6 +76,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </footer>

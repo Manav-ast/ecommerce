@@ -26,4 +26,8 @@
             </div>
         @endforeach
     </div>
+    <!-- Pagination -->
+    <div class="my-8 ">
+        {{ $categories->links() }}
+    </div>
 </div>

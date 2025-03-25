@@ -11,7 +11,6 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Auth\DuplicateCheckController;
 
 
-
 Route::middleware("guest:user")->group(function () {
     Route::get("login", [LoginController::class, "index"])->name("user.login");
     Route::post("login", [LoginController::class, "authenticate"])->name("user.authenticate");
