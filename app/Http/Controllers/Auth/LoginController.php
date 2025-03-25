@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     // Show login page
-    public function index() {
+    public function index()
+    {
         try {
             return view("pages.auth.login");
         } catch (Exception $e) {
@@ -20,7 +21,8 @@ class LoginController extends Controller
     }
 
     // Authenticate user
-    public function authenticate(AuthRequest $request) {
+    public function authenticate(AuthRequest $request)
+    {
         try {
             $credentials = $request->only(["email", "password"]);
 
@@ -43,14 +45,14 @@ class LoginController extends Controller
             return back()->withErrors([
                 'email' => 'The provided credentials do not match our records.',
             ])->onlyInput('email');
-
         } catch (Exception $e) {
             return back()->with('error', 'Something went wrong while logging in.');
         }
     }
 
     // Logout user
-    public function logout() {
+    public function logout()
+    {
         try {
             Auth::guard("user")->logout();
             return redirect(route("user.login"))->with('success', 'You have been logged out.');

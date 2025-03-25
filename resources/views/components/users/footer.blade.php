@@ -4,6 +4,7 @@
             <img src="assets/images/logo.svg" alt="logo" class="w-30">
             <div class="mr-2">
                 <p class="text-gray-500">
+                    
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, hic?
                 </p>
             </div>

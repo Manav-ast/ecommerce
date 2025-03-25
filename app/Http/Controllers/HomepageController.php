@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Log;
 
 class HomepageController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         try {
             $categories = Category::all();
             return view("pages.home", compact('categories'));

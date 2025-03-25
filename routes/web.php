@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\DuplicateCheckController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminStaticBlockController;
-
+use App\Http\Controllers\HomepageController;
 
 @require_once('user.php');
 
