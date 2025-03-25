@@ -1,5 +1,5 @@
 @props(['product'])
-
+{{-- @dd($product) --}}
 <div
     class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-2xl">
     <!-- Clickable Wrapper -->

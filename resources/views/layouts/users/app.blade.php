@@ -25,7 +25,7 @@
     <x-users.navbar />
     <main>
         @if (request()->routeIs('homepage'))
-            <x-users.homepage-banner :banner="getHomeBanner()" />
+            <x-users.homepage-banner :banner="getStaticBlock('home-banner')" />
         @endif
         @yield('content')
         @if (request()->routeIs('homepage'))
@@ -33,7 +33,7 @@
         @endif
     </main>
     {{-- @dd($footerBlock) --}}
-    <x-users.footer :footerBlock="getFooterBlock()" :footerLinks="getFooterLinks()" />
+    <x-users.footer :footerBlock="getStaticBlock('footer-test')" :footerLinks="getStaticBlock('footer-link')" />
     <x-users.copy-right />
 
     @stack('scripts')
