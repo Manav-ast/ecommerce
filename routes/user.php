@@ -46,4 +46,9 @@ Route::middleware("auth:user")->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+    // User Profile Routes
+    Route::get('/profile', [\App\Http\Controllers\UserProfileController::class, 'index'])->name('profile.dashboard');
+    Route::get('/profile/orders', [\App\Http\Controllers\UserProfileController::class, 'orders'])->name('profile.orders');
+    Route::get('/profile/orders/{id}/details', [\App\Http\Controllers\UserProfileController::class, 'orderDetails']);
 });

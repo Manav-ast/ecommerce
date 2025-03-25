@@ -52,10 +52,10 @@
                         class="block w-full py-2 px-4 text-center text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                         Continue Shopping
                     </a>
-                    {{-- <a href="{{ route('profile.orders') }}"
+                    <a href="{{ route('profile.orders') }}"
                         class="block w-full py-2 px-4 text-center text-primary bg-white border border-primary rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition">
                         View My Orders
-                    </a> --}}
+                    </a>
                 </div>
             </div>
         </div>

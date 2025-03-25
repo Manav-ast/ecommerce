@@ -38,18 +38,20 @@
                 <div class="relative group">
                     <button class="text-white hover:text-blue-200 transition flex items-center">
                         <i class="fa-regular fa-user-circle mr-2"></i> {{ Auth::user()->name }}
-                        <i class="fa-solid fa-chevron-down ml-2"></i>
+                        {{-- <i class="fa-solid fa-chevron-down ml-2"></i> --}}
                     </button>
-                    <div
+                    {{-- <div
                         class="absolute right-0 w-48 bg-white shadow-md rounded-md py-2 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition duration-300 z-20">
-                        {{-- <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Profile</a> --}}
-                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Orders</a>
+                        <a href="{{ route('profile.dashboard') }}"
+                            class="block px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Profile</a>
+                        <a href="{{ route('profile.orders') }}"
+                            class="block px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Orders</a>
                         <form method="GET" action="{{ route('user.logout') }}">
                             @csrf
                             <button type="submit"
                                 class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-100 transition">Logout</button>
                         </form>
-                    </div>
+                    </div> --}}
                 </div>
             @endguest
         </div>
