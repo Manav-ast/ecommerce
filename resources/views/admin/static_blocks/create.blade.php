@@ -59,6 +59,7 @@
 <!-- JavaScript for Slug & AJAX -->
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         $(document).ready(function() {
             // Initialize Summernote
@@ -76,6 +77,38 @@
             $('input, select, textarea').on('input change', function() {
                 let errorId = 'error-' + $(this).attr('name');
                 $('#' + errorId).addClass('hidden');
+            });
+
+            // AJAX form submission
+            $('#addStaticBlockForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Get form data including Summernote content
+                let formData = new FormData(this);
+                formData.set('content', $('#content').summernote('code'));
+
+                $.ajax({
+                    url: '{{ route('admin.static_blocks.store') }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        window.location.href = '{{ route('admin.static_blocks.index') }}';
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            Object.keys(errors).forEach(function(key) {
+                                $('#error-' + key)
+                                    .removeClass('hidden')
+                                    .text(errors[key][0]);
+                            });
+                        } else {
+                            alert('An error occurred. Please try again.');
+                        }
+                    }
+                });
             });
 
             // Initialize jQuery Validator
@@ -119,6 +152,9 @@
                 submitHandler: function(form) {
                     let formData = new FormData(form);
 
+                    // Get content from Summernote editor
+                    formData.set('content', $('#content').summernote('code'));
+
                     $.ajax({
                         url: "{{ route('admin.static_blocks.store') }}",
                         type: "POST",
@@ -128,23 +164,44 @@
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        success: function(data) {
-                            if (data.success) {
-                                showSuccessToast(data.message);
+                        success: function(response) {
+                            if (response.success) {
+                                showSuccessToast(response.message ||
+                                    'Static block created successfully!');
                                 setTimeout(() => {
-                                    window.location.href = "{{ route('admin.static_blocks.index') }}";
+                                    window.location.href =
+                                        "{{ route('admin.static_blocks.index') }}";
                                 }, 1000);
-                            } else if (data.errors) {
-                                $.each(data.errors, function(key, value) {
-                                    $('#error-' + key).text(value[0]).removeClass('hidden');
-                                });
                             } else {
-                                showErrorToast('An error occurred.');
+                                showErrorToast(response.message ||
+                                    'An error occurred while creating the static block.'
+                                );
+                                // Display validation errors if any
+                                if (response.errors) {
+                                    $.each(response.errors, function(key, value) {
+                                        $('#error-' + key).text(value[0])
+                                            .removeClass('hidden');
+                                    });
+                                }
                             }
                         },
                         error: function(xhr, status, error) {
-                            console.error('Error:', error);
-                            showErrorToast('An error occurred.');
+                            // Clear previous errors
+                            $('.text-red-500').addClass('hidden');
+
+                            if (xhr.status === 422) {
+                                // Handle validation errors
+                                const errors = xhr.responseJSON.errors;
+                                $.each(errors, function(key, value) {
+                                    $('#error-' + key).text(value[0]).removeClass(
+                                        'hidden');
+                                });
+                                showErrorToast('Please check the form for errors.');
+                            } else {
+                                console.error('Error:', error);
+                                showErrorToast(xhr.responseJSON?.message ||
+                                    'An error occurred while processing your request.');
+                            }
                         }
                     });
                 }
@@ -155,4 +212,41 @@
 
 @push('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 @endpush
+
+<script>
+    // Toast Configuration
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "2000"
+    };
+
+    function showSuccessToast(message) {
+        toastr.success(message);
+    }
+
+    function showErrorToast(message) {
+        toastr.error(message);
+    }
+</script>
+
+<script>
+    // Toast Configuration
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "2000"
+    };
+
+    function showSuccessToast(message) {
+        toastr.success(message);
+    }
+
+    function showErrorToast(message) {
+        toastr.error(message);
+    }
+</script>

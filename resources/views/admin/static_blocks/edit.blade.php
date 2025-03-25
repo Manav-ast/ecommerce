@@ -65,12 +65,6 @@
             // Initialize Summernote
             $('#content').summernote({
                 height: 300,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
             });
 
             // Auto-generate slug from title

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\StaticBlock;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Http\Requests\Admin\StaticBlockRequest;
 
 class AdminStaticBlockController extends Controller
 {
@@ -16,7 +18,7 @@ class AdminStaticBlockController extends Controller
      */
     public function index()
     {
-        $staticBlocks = StaticBlock::orderBy('id', 'desc')->paginate(10);
+        $staticBlocks = StaticBlock::orderBy('id', 'desc')->paginate(8);
         return view('admin.static_blocks.index', compact('staticBlocks'));
     }
 
@@ -36,28 +38,17 @@ class AdminStaticBlockController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StaticBlockRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:static_blocks,slug',
-            'content' => 'required',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         try {
-            StaticBlock::create([
-                'title' => $request->title,
-                'slug' => $request->slug,
-                'content' => $request->content,
-                'status' => $request->status,
-            ]);
+            StaticBlock::create($request->validated());
 
             return redirect()->route('admin.static_blocks.index')
                 ->with('success', 'Static block created successfully.');
         } catch (\Exception $e) {
+            Log::error('Static Block Creation Error: ' . $e->getMessage());
             return redirect()->back()
-                ->with('error', 'Error creating static block: ' . $e->getMessage())
+                ->with('error', 'Error creating static block. Check logs for details.')
                 ->withInput();
         }
     }
@@ -81,24 +72,11 @@ class AdminStaticBlockController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StaticBlockRequest $request, $id)
     {
-        $staticBlock = StaticBlock::findOrFail($id);
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:static_blocks,slug,' . $id,
-            'content' => 'required',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         try {
-            $staticBlock->update([
-                'title' => $request->title,
-                'slug' => $request->slug,
-                'content' => $request->content,
-                'status' => $request->status,
-            ]);
+            $staticBlock = StaticBlock::findOrFail($id);
+            $staticBlock->update($request->validated());
 
             return redirect()->route('admin.static_blocks.index')
                 ->with('success', 'Static block updated successfully.');
@@ -121,13 +99,18 @@ class AdminStaticBlockController extends Controller
             $staticBlock = StaticBlock::findOrFail($id);
             $staticBlock->delete();
 
-            return redirect()->route('admin.static_blocks.index')
-                ->with('success', 'Static block deleted successfully.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Static block deleted successfully.'
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error deleting static block: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting static block: ' . $e->getMessage()
+            ], 500);
         }
     }
+
 
     /**
      * Search for static blocks.
@@ -137,12 +120,15 @@ class AdminStaticBlockController extends Controller
      */
     public function search(Request $request)
     {
-        $search = $request->get('search');
+        $search = $request->get('q');
+
         $staticBlocks = StaticBlock::where('title', 'like', '%' . $search . '%')
             ->orWhere('slug', 'like', '%' . $search . '%')
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->get(); // Get all results instead of paginate for AJAX
 
-        return view('admin.static_blocks.index', compact('staticBlocks'));
+        $html = view('admin.static_blocks.partials.table', compact('staticBlocks'))->render();
+
+        return response()->json(['html' => $html]);
     }
 }
