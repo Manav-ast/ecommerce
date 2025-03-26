@@ -19,23 +19,23 @@ use App\Http\Controllers\HomepageController;
 Route::prefix("admin")->group(function () {
 
     Route::middleware("guest:admin")->group(function () {
-        Route::get("login", [AdminLoginController::class, "index"])->name("admin.login");
-        Route::post("login", [AdminLoginController::class, "authenticate"])->name("admin.authenticate");
+        Route::get("/login", [AdminLoginController::class, "index"])->name("admin.login");
+        Route::post("/login", [AdminLoginController::class, "authenticate"])->name("admin.authenticate");
     });
 
     Route::middleware("auth:admin")->group(function () {
         //login and logout routes
-        Route::get("/", [DashboardController::class, "index"])->name("admin.dashboard");
-        Route::get("logout", [AdminLoginController::class, "logout"])->name("admin.logout");
+        Route::get("/dashboard", [DashboardController::class, "index"])->name("admin.dashboard");
+        Route::get("/logout", [AdminLoginController::class, "logout"])->name("admin.logout");
 
         //Admin Category Routes
-        Route::get("category", [AdminCategoryController::class, "index"])->name("admin.categories");
-        Route::get('category/create', [AdminCategoryController::class, 'create'])->name('admin.categories.create');
-        Route::post('category/store', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
-        Route::get('category/edit/{id}', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
-        Route::put('categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
-        Route::get('categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
-        Route::delete('categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
+        Route::get("/category", [AdminCategoryController::class, "index"])->name("admin.categories");
+        Route::get('/category/create', [AdminCategoryController::class, 'create'])->name('admin.categories.create');
+        Route::post('/category/store', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
+        Route::get('/category/edit/{id}', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
+        Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
+        Route::get('/categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
+        Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
         //Admin products routes
         Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products');

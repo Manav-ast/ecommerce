@@ -13,8 +13,8 @@ use App\Http\Controllers\PageController;
 
 
 Route::middleware("guest:user")->group(function () {
-    Route::get("login", [LoginController::class, "index"])->name("user.login");
-    Route::post("login", [LoginController::class, "authenticate"])->name("user.authenticate");
+    Route::get("/login", [LoginController::class, "index"])->name("user.login");
+    Route::post("/login", [LoginController::class, "authenticate"])->name("user.authenticate");
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('user.register');
     Route::post('/register', [RegisterController::class, 'register']);
 
