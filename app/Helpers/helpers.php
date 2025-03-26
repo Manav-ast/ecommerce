@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\StaticBlock;
-
+use App\Models\PageBlock;
 if (!function_exists('getFooterBlock')) {
     function getStaticBlock($slug = 'footer-test')
     {
