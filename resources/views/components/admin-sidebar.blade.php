@@ -67,6 +67,14 @@
                         <span class="ml-4">Static Blocks</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.page_blocks.index') }}"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                        {{ request()->routeIs('admin.page_blocks.index') ? 'bg-blue-500 text-white' : '' }}">
+                        <i class="uil uil-file-alt text-lg"></i>
+                        <span class="ml-4">Page Blocks</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

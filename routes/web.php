@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\DuplicateCheckController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminStaticBlockController;
+use App\Http\Controllers\Admin\AdminPageBlockController;
 use App\Http\Controllers\HomepageController;
 
 @require('user.php');
@@ -84,5 +85,14 @@ Route::prefix("admin")->group(function () {
         Route::put('/static-blocks/update/{id}', [AdminStaticBlockController::class, 'update'])->name('admin.static_blocks.update');
         Route::delete('/static-blocks/{id}', [AdminStaticBlockController::class, 'destroy'])->name('admin.static_blocks.destroy');
         Route::get('/static-blocks/search', [AdminStaticBlockController::class, 'search'])->name('admin.static_blocks.search');
+
+        //Admin Page block routes
+        Route::get('/page-blocks', [AdminPageBlockController::class, 'index'])->name('admin.page_blocks.index');
+        Route::get('/page-blocks/create', [AdminPageBlockController::class, 'create'])->name('admin.page_blocks.create');
+        Route::post('/page-blocks/store', [AdminPageBlockController::class, 'store'])->name('admin.page_blocks.store');
+        Route::get('/page-blocks/edit/{id}', [AdminPageBlockController::class, 'edit'])->name('admin.page_blocks.edit');
+        Route::put('/page-blocks/update/{id}', [AdminPageBlockController::class, 'update'])->name('admin.page_blocks.update');
+        Route::delete('/page-blocks/{id}', [AdminPageBlockController::class, 'destroy'])->name('admin.page_blocks.destroy');
+        Route::get('/page-blocks/search', [AdminPageBlockController::class, 'search'])->name('admin.page_blocks.search');
     });
 });
