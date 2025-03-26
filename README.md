@@ -1,67 +1,179 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# E-Commerce Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
 
-## About Laravel
+This is a full-featured e-commerce application built with Laravel. It provides a complete solution for online shopping with separate user and admin interfaces, product management, shopping cart functionality, checkout process, and order management.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### User Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **User Authentication**: Register, login, and manage user accounts
+-   **Product Browsing**: Browse products by category with filtering options
+-   **Shopping Cart**: Add, update, and remove products from cart
+-   **Checkout Process**: Complete purchases with shipping and payment information
+-   **Order Tracking**: View order history and status
+-   **Email Notifications**: Receive welcome emails and order confirmations
 
-## Learning Laravel
+### Admin Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   **Admin Dashboard**: Overview of sales, orders, and user activity
+-   **Product Management**: Add, edit, and delete products
+-   **Category Management**: Create and manage product categories
+-   **Order Management**: View and update order status
+-   **User Management**: Manage user accounts and roles
+-   **Content Management**: Manage static blocks and page content
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Technology Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   **Backend**: Laravel 12.x
+-   **Database**: MySQL
+-   **Frontend**: Blade templates, JavaScript
+-   **Authentication**: Laravel's built-in authentication system with multi-guard support
 
-## Laravel Sponsors
+## Installation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Prerequisites
 
-### Premium Partners
+-   PHP >= 8.2
+-   Composer
+-   MySQL or compatible database
+-   Node.js and NPM (for frontend assets)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Setup Instructions
+
+1. Clone the repository:
+
+    ```
+    git clone <repository-url>
+    cd ecommerce
+    ```
+
+2. Install PHP dependencies:
+
+    ```
+    composer install
+    ```
+
+3. Install JavaScript dependencies:
+
+    ```
+    npm install
+    ```
+
+4. Create a copy of the environment file:
+
+    ```
+    cp .env.example .env
+    ```
+
+5. Generate application key:
+
+    ```
+    php artisan key:generate
+    ```
+
+6. Configure your database in the `.env` file:
+
+    ```
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=your_database_name
+    DB_USERNAME=your_database_username
+    DB_PASSWORD=your_database_password
+    ```
+
+7. Run database migrations and seeders:
+
+    ```
+    php artisan migrate --seed
+    ```
+
+8. Build frontend assets:
+
+    ```
+    npm run dev
+    ```
+
+9. Start the development server:
+
+    ```
+    php artisan serve
+    ```
+
+10. Access the application at `http://localhost:8000`
+
+## Email Configuration
+
+### Mailtrap Setup (Development)
+
+1. Create a [Mailtrap](https://mailtrap.io/) account if you don't have one
+2. Create a new inbox in your Mailtrap account
+3. Copy the SMTP credentials from your Mailtrap inbox
+4. Update your `.env` file with the following settings:
+
+```
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_username
+MAIL_PASSWORD=your_mailtrap_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@ecommerce.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+### Email Features
+
+-   **Welcome Email**: Sent to users upon registration
+-   **Order Confirmation Email**: Sent to users after order placement
+
+## Usage
+
+### User Interface
+
+-   **Homepage**: Browse featured products and categories
+-   **Shop**: View all products with filtering options
+-   **Product Details**: View detailed product information
+-   **Cart**: Manage items in your shopping cart
+-   **Checkout**: Complete your purchase
+-   **User Profile**: Manage your account and view order history
+
+### Admin Interface
+
+-   **Dashboard**: Access at `/admin`
+-   **Products**: Manage product listings
+-   **Categories**: Organize products into categories
+-   **Orders**: View and manage customer orders
+-   **Users**: Manage user accounts
+-   **Content**: Manage static blocks and page content
+
+## Development
+
+### Key Components
+
+-   **Models**: Located in `app/Models/`
+-   **Controllers**: Located in `app/Http/Controllers/`
+-   **Views**: Located in `resources/views/`
+-   **Routes**: Defined in `routes/web.php` and `routes/user.php`
+-   **Services**: Located in `app/Services/`
+
+### Multi-Guard Authentication
+
+The application uses Laravel's multi-guard authentication to separate user and admin access:
+
+-   **User Guard**: For regular customers
+-   **Admin Guard**: For administrative access
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Submit a pull request
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# multi-guard-demo
+This project is licensed under the MIT License - see the LICENSE file for details.

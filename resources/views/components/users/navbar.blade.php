@@ -28,7 +28,7 @@
             <div class="flex items-center space-x-6 capitalize">
                 <a href="/" class="text-white hover:text-blue-200 transition">Home</a>
                 <a href="{{ route('shop.index') }}" class="text-white hover:text-blue-200 transition">Shop</a>
-                <a href="{{ route('page.show', 	'contact-us') }}" class="text-white hover:text-blue-200 transition">Contact Us</a>
+                <a href="{{ route('page.show', 'contact-us') }}" class="text-white hover:text-blue-200 transition">Contact Us</a>
             </div>
 
             <!-- Authentication -->
