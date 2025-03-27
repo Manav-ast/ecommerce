@@ -11,7 +11,7 @@ class PageController extends Controller
     public function show($slug)
     {
         try{
-            $page = PageBlock::where('slug', $slug)->where('status', 'active')->first();
+            $page = PageBlock::where('slug', $slug)->where('status', PageBlock::ACTIVE_STATUS)->first();
             if ($page) {
                 return view('pages.page', compact('page'));
             } else {

@@ -119,19 +119,53 @@
         </div>
     </div>
 
-    <!-- Shipping Address -->
-    @if (isset($order->address))
-        <div>
-            <h3 class="font-medium text-gray-800 mb-3">Shipping Address</h3>
+    <!-- Address Information -->
+    <div>
+        <h3 class="font-medium text-gray-800 mb-3">Address Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Billing Address -->
             <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-gray-700">{{ $order->address->address_line1 }}</p>
-                @if ($order->address->address_line2)
-                    <p class="text-gray-700">{{ $order->address->address_line2 }}</p>
+                <h4 class="font-medium text-gray-700 mb-2">Billing Address</h4>
+                @php
+                    $billingAddress = $order->addresses->where('type', 'billing')->first();
+                @endphp
+
+                @if ($billingAddress)
+                    <p class="text-gray-700">{{ $billingAddress->address_line1 }}</p>
+                    @if ($billingAddress->address_line2)
+                        <p class="text-gray-700">{{ $billingAddress->address_line2 }}</p>
+                    @endif
+                    <p class="text-gray-700">{{ $billingAddress->city }}, {{ $billingAddress->state }}
+                        {{ $billingAddress->postal_code }}</p>
+                    <p class="text-gray-700">{{ $billingAddress->country }}</p>
+                    @if ($billingAddress->is_default)
+                        <span class="inline-block mt-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Default
+                            Address</span>
+                    @endif
+                @else
+                    <p class="text-gray-500">No billing address information available.</p>
                 @endif
-                <p class="text-gray-700">{{ $order->address->city }}, {{ $order->address->state }}
-                    {{ $order->address->postal_code }}</p>
-                <p class="text-gray-700">{{ $order->address->country }}</p>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-medium text-gray-700 mb-2">Shipping Address</h4>
+                @php
+                    $shippingAddress = $order->addresses->where('type', 'shipping')->first();
+                @endphp
+
+                @if ($shippingAddress)
+                    <p class="text-gray-700">{{ $shippingAddress->address_line1 }}</p>
+                    @if ($shippingAddress->address_line2)
+                        <p class="text-gray-700">{{ $shippingAddress->address_line2 }}</p>
+                    @endif
+                    <p class="text-gray-700">{{ $shippingAddress->city }}, {{ $shippingAddress->state }}
+                        {{ $shippingAddress->postal_code }}</p>
+                    <p class="text-gray-700">{{ $shippingAddress->country }}</p>
+                @else
+                    <p class="text-gray-500">No shipping address information available.</p>
+                @endif
             </div>
         </div>
-    @endif
+    </div>
 </div>

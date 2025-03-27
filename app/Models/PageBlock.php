@@ -9,6 +9,8 @@ class PageBlock extends Model
 {
     use HasFactory;
 
+    const ACTIVE_STATUS = 'active';
+
     protected $table = 'page_block';
 
     protected $fillable = [

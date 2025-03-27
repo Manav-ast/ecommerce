@@ -57,7 +57,7 @@ class CheckoutService
             $this->createPayment($order, $data['payment_method'], $totalPrice);
 
             // Save billing address
-            $this->saveAddress($data);
+            $this->saveAddress($data, $order);
 
             // Log successful order creation for debugging
             Log::info('Order created successfully', [
@@ -167,20 +167,73 @@ class CheckoutService
      * Save address information
      *
      * @param array $data
-     * @return Address
+     * @param Order $order
+     * @return void
      */
-    private function saveAddress(array $data)
+    private function saveAddress(array $data, Order $order)
     {
-        return Address::create([
+        // Check if the address should be saved as default
+        $isDefault = isset($data['save_as_default']) && !empty($data['save_as_default']);
+
+        // If setting as default, remove default flag from all existing user addresses
+        if ($isDefault && Auth::check()) {
+            Address::where('user_id', Auth::id())
+                ->where('is_default', true)
+                ->update(['is_default' => false]);
+        }
+
+        // Create billing address
+        $billingAddress = Address::create([
             'user_id' => Auth::id(),
+            'order_id' => $order->id,
             'address_line1' => $data['address'],
             'address_line2' => $data['address_line2'] ?? null,
             'city' => $data['city'],
             'state' => $data['state'] ?? '',
-            'postal_code' => $data['postal'],
+            'postal_code' => $data['postal'] ?? null,
             'country' => $data['region'],
-            'type' => $data['address_type'] ?? 'billing',
+            'type' => 'billing',
+            'is_default' => $isDefault,
         ]);
+
+        // Debug log to see what value is being received for shipping_same_as_billing
+        Log::info('Shipping same as billing value:', [
+            'isset' => isset($data['shipping_same_as_billing']),
+            'value' => $data['shipping_same_as_billing'] ?? 'not set',
+            'type' => isset($data['shipping_same_as_billing']) ? gettype($data['shipping_same_as_billing']) : 'N/A'
+        ]);
+
+        // Check if shipping address is same as billing address
+        // HTML checkboxes can send various values: '1', 'on', 'true', etc.
+        if (isset($data['shipping_same_as_billing']) && !empty($data['shipping_same_as_billing'])) {
+            // Create shipping address with same data but different type
+            Address::create([
+                'user_id' => Auth::id(),
+                'order_id' => $order->id,
+                'address_line1' => $data['address'],
+                'address_line2' => $data['address_line2'] ?? null,
+                'city' => $data['city'],
+                'state' => $data['state'] ?? '',
+                'postal_code' => $data['postal'] ?? null,
+                'country' => $data['region'],
+                'type' => 'shipping',
+                'is_default' => false, // Shipping address is not set as default
+            ]);
+        } else {
+            // Create shipping address with different data
+            Address::create([
+                'user_id' => Auth::id(),
+                'order_id' => $order->id,
+                'address_line1' => $data['shipping_address'] ?? $data['address'],
+                'address_line2' => $data['shipping_address_line2'] ?? null,
+                'city' => $data['shipping_city'] ?? $data['city'],
+                'state' => $data['shipping_state'] ?? $data['state'] ?? '',
+                'postal_code' => $data['shipping_postal'] ?? $data['postal'] ?? null,
+                'country' => $data['shipping_region'] ?? $data['region'],
+                'type' => 'shipping',
+                'is_default' => false, // Shipping address is not set as default
+            ]);
+        }
     }
 
     /**
@@ -219,13 +272,14 @@ class CheckoutService
             ];
         }
 
-        // Check if user is authenticated
-        if (!Auth::check()) {
-            return [
-                'success' => false,
-                'message' => 'You must be logged in to checkout'
-            ];
-        }
+        // No need to check authentication here as the route is already protected by auth middleware
+        // The following check is redundant and can cause issues
+        // if (!Auth::check()) {
+        //     return [
+        //         'success' => false,
+        //         'message' => 'You must be logged in to checkout'
+        //     ];
+        // }
 
         // Validate required fields
         $requiredFields = ['address', 'city', 'postal', 'region', 'payment_method'];

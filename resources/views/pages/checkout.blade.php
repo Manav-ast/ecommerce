@@ -8,29 +8,63 @@
 
             <h3 class="text-xl font-semibold capitalize mb-6">Checkout</h3>
 
-            <!-- Address Type Selection -->
-            <div class="mb-6">
-                <label class="block text-gray-600 mb-2">Address Type <span class="text-blue-500"
-                        aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="radio" name="address_type" value="billing"
-                            class="mr-2 focus:ring-2 focus:ring-blue-500"
-                            {{ old('address_type', 'billing') == 'billing' ? 'checked' : '' }} required
-                            aria-required="true">
-                        <span class="text-gray-700">Billing Address</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer">
-                        <input type="radio" name="address_type" value="shipping"
-                            class="mr-2 focus:ring-2 focus:ring-blue-500"
-                            {{ old('address_type') == 'shipping' ? 'checked' : '' }}>
-                        <span class="text-gray-700">Shipping Address</span>
-                    </label>
+            <!-- Hidden input for address type, defaulting to billing -->
+            <input type="hidden" name="address_type" value="billing">
+
+            <!-- Saved Addresses Section -->
+            @if (Auth::check() && Auth::user()->addresses->count() > 0)
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium mb-3">Your Saved Addresses</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @php
+                            // Get default address
+                            $defaultAddress = Auth::user()->addresses->where('is_default', true)->first();
+
+                            // Get most recent non-default address if exists
+                            $recentAddress = Auth::user()
+                                ->addresses->where('is_default', false)
+                                ->sortByDesc('created_at')
+                                ->first();
+                        @endphp
+
+                        @if ($defaultAddress)
+                            <div class="border border-gray-200 rounded-md p-3 hover:border-blue-500 cursor-pointer transition-all bg-blue-50"
+                                onclick="selectSavedAddress({{ json_encode($defaultAddress) }}, event)">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="font-medium text-gray-800">{{ ucfirst($defaultAddress->type) }}
+                                        Address</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Default</span>
+                                </div>
+                                <p class="text-sm text-gray-600">{{ $defaultAddress->address_line1 }}</p>
+                                @if ($defaultAddress->address_line2)
+                                    <p class="text-sm text-gray-600">{{ $defaultAddress->address_line2 }}</p>
+                                @endif
+                                <p class="text-sm text-gray-600">{{ $defaultAddress->city }}, {{ $defaultAddress->state }}
+                                    {{ $defaultAddress->postal_code }}</p>
+                                <p class="text-sm text-gray-600">{{ $defaultAddress->country }}</p>
+                            </div>
+                        @endif
+
+                        @if ($recentAddress)
+                            <div class="border border-gray-200 rounded-md p-3 hover:border-blue-500 cursor-pointer transition-all"
+                                onclick="selectSavedAddress({{ json_encode($recentAddress) }}, event)">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="font-medium text-gray-800">{{ ucfirst($recentAddress->type) }}
+                                        Address</span>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Recent</span>
+                                </div>
+                                <p class="text-sm text-gray-600">{{ $recentAddress->address_line1 }}</p>
+                                @if ($recentAddress->address_line2)
+                                    <p class="text-sm text-gray-600">{{ $recentAddress->address_line2 }}</p>
+                                @endif
+                                <p class="text-sm text-gray-600">{{ $recentAddress->city }}, {{ $recentAddress->state }}
+                                    {{ $recentAddress->postal_code }}</p>
+                                <p class="text-sm text-gray-600">{{ $recentAddress->country }}</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-                @error('address_type')
-                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                @enderror
-            </div>
+            @endif
 
             <!-- Billing Information -->
             <fieldset class="space-y-6">
@@ -51,8 +85,7 @@
                         <label for="last-name" class="block text-gray-600 mb-1">Last Name <span class="text-blue-500"
                                 aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
                         <input type="text" name="last_name" id="last-name" class="input-box w-full"
-                            value="{{ old('last_name') }}" required aria-required="true"
-                            placeholder="Doe">
+                            value="{{ old('last_name') }}" required aria-required="true" placeholder="Doe">
                         @error('last_name')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                         @enderror
@@ -156,6 +189,101 @@
                         @enderror
                     </div>
                 </div>
+
+                <!-- Save as Default Address Checkbox -->
+                @if (Auth::check())
+                    <div class="mt-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="save_as_default" id="save_as_default"
+                                class="mr-2 focus:ring-2 focus:ring-blue-500" value="1"
+                                {{ old('save_as_default') ? 'checked' : '' }}>
+                            <span class="text-gray-700">Save this as my default address</span>
+                        </label>
+                    </div>
+                @endif
+            </fieldset>
+
+            <!-- Shipping Address Checkbox -->
+            <div class="mt-6 mb-6">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" name="shipping_same_as_billing" id="shipping_same_as_billing"
+                        class="mr-2 focus:ring-2 focus:ring-blue-500" value="1"
+                        {{ old('shipping_same_as_billing') ? 'checked' : '' }}>
+                    <span class="text-gray-700">Shipping address is same as billing address</span>
+                </label>
+            </div>
+
+            <!-- Shipping Address Form -->
+            <fieldset id="shipping_address_form"
+                class="space-y-6 mt-6 {{ old('shipping_same_as_billing') ? 'hidden' : '' }}">
+                <legend class="text-lg font-medium mb-4">Shipping Details</legend>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="shipping_address" class="block text-gray-600 mb-1">Street Address <span
+                                class="text-blue-500" aria-hidden="true">*</span><span
+                                class="sr-only">(required)</span></label>
+                        <input type="text" name="shipping_address" id="shipping_address" class="input-box w-full"
+                            value="{{ old('shipping_address') }}" placeholder="123 Main St">
+                        @error('shipping_address')
+                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="shipping_address_line2" class="block text-gray-600 mb-1">Apartment, suite, etc. <span
+                                class="text-gray-400">(optional)</span></label>
+                        <input type="text" name="shipping_address_line2" id="shipping_address_line2"
+                            class="input-box w-full" value="{{ old('shipping_address_line2') }}"
+                            placeholder="Apartment, suite, unit, etc.">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="shipping_city" class="block text-gray-600 mb-1">City <span class="text-blue-500"
+                                aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                        <input type="text" name="shipping_city" id="shipping_city" class="input-box w-full"
+                            value="{{ old('shipping_city') }}" placeholder="New York">
+                        @error('shipping_city')
+                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="shipping_state" class="block text-gray-600 mb-1">State/Province <span
+                                class="text-gray-400">(optional)</span></label>
+                        <input type="text" name="shipping_state" id="shipping_state" class="input-box w-full"
+                            value="{{ old('shipping_state') }}" placeholder="NY">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="shipping_postal" class="block text-gray-600 mb-1">Postal Code <span
+                                class="text-blue-500" aria-hidden="true">*</span><span
+                                class="sr-only">(required)</span></label>
+                        <input type="text" name="shipping_postal" id="shipping_postal" class="input-box w-full"
+                            value="{{ old('shipping_postal') }}" placeholder="10001">
+                        @error('shipping_postal')
+                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="shipping_region" class="block text-gray-600 mb-1">Country/Region <span
+                                class="text-blue-500" aria-hidden="true">*</span><span
+                                class="sr-only">(required)</span></label>
+                        <select name="shipping_region" id="shipping_region" class="input-box w-full">
+                            <option value="">Select a country</option>
+                            @foreach ($countries as $code => $name)
+                                <option value="{{ $code }}"
+                                    {{ old('shipping_region') == $code ? 'selected' : '' }}>
+                                    {{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('shipping_region')
+                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
             </fieldset>
 
             <!-- Payment Method -->
@@ -255,6 +383,57 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('checkout-form');
+            const shippingSameAsBilling = document.getElementById('shipping_same_as_billing');
+            const shippingAddressForm = document.getElementById('shipping_address_form');
+
+            // Function to toggle shipping address form visibility
+            function toggleShippingForm() {
+                if (shippingSameAsBilling.checked) {
+                    shippingAddressForm.classList.add('hidden');
+                } else {
+                    shippingAddressForm.classList.remove('hidden');
+                }
+            }
+
+            // Initial toggle based on checkbox state
+            toggleShippingForm();
+
+            // Add event listener for checkbox changes
+            shippingSameAsBilling.addEventListener('change', toggleShippingForm);
+
+            // Function to fill form with selected saved address
+            window.selectSavedAddress = function(address, event) {
+                // Fill billing address fields
+                document.getElementById('address').value = address.address_line1;
+                document.getElementById('address_line2').value = address.address_line2 || '';
+                document.getElementById('city').value = address.city;
+                document.getElementById('state').value = address.state || '';
+                document.getElementById('postal').value = address.postal_code;
+                document.getElementById('region').value = address.country;
+
+                // Highlight the selected address
+                const addressCards = document.querySelectorAll('.grid .border');
+                addressCards.forEach(card => {
+                    card.classList.remove('bg-blue-50', 'border-blue-500');
+                });
+                event.currentTarget.classList.add('bg-blue-50', 'border-blue-500');
+
+                // Optionally auto-fill shipping address if it's the same
+                if (shippingSameAsBilling.checked) {
+                    // No need to fill shipping fields as they will use the billing address
+                } else {
+                    // Only if the address type is shipping, fill the shipping fields
+                    if (address.type === 'shipping') {
+                        document.getElementById('shipping_address').value = address.address_line1;
+                        document.getElementById('shipping_address_line2').value = address.address_line2 || '';
+                        document.getElementById('shipping_city').value = address.city;
+                        document.getElementById('shipping_state').value = address.state || '';
+                        document.getElementById('shipping_postal').value = address.postal_code;
+                        document.getElementById('shipping_region').value = address.country;
+                    }
+                }
+            };
+
             form.addEventListener('submit', function(e) {
                 const agreement = document.getElementById('agreement');
                 if (!agreement.checked) {

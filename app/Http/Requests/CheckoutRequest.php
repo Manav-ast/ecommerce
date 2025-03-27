@@ -21,7 +21,8 @@ class CheckoutRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        // Always required fields
+        $rules = [
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'company' => 'nullable|string|max:100',
@@ -33,9 +34,23 @@ class CheckoutRequest extends FormRequest
             'phone' => 'required|string|max:20',
             'email' => 'required|email|max:100',
             'payment_method' => 'required|in:credit_card,paypal',
-            'address_type' => 'required|in:billing,shipping',
+            'address_type' => 'nullable|in:billing,shipping',
+            'shipping_same_as_billing' => 'nullable',
+            'save_as_default' => 'nullable',
             'agreement' => 'required|accepted'
         ];
+
+        // Add shipping address validation rules if shipping_same_as_billing is empty
+        if (empty($this->shipping_same_as_billing)) {
+            $rules['shipping_address'] = 'required|string|max:255';
+            $rules['shipping_address_line2'] = 'nullable|string|max:255';
+            $rules['shipping_city'] = 'required|string|max:100';
+            $rules['shipping_state'] = 'nullable|string|max:100';
+            $rules['shipping_postal'] = 'required|string|max:20';
+            $rules['shipping_region'] = 'required|string|max:100';
+        }
+
+        return $rules;
     }
 
     /**

@@ -17,11 +17,15 @@
     <!-- Content Overlay -->
     <div class="container">
         <h1 class="text-6xl text-gray-800 font-medium mb-4 capitalize">
-            {!! $title1->content !!}
-            {{-- Deals & Collections --}}
+            @if (!@empty($title1->content))
+                {!! $title1->content !!}
+                @else
+                Deals & Collections
+            @endif
         </h1>
-        {{-- <p>Shop top-quality products across fashion.</p> --}}
-        {!! $subtitle->content !!}
+        <p>Shop top-quality products across fashion.</p>
+
+        {{-- {!! $subtitle->content !!} --}}
         <div class="mt-12">
             <a href="/shop"
                 class="bg-blue-500 border border-blue-700 text-white px-8 py-3 font-medium 

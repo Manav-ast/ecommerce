@@ -31,4 +31,9 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }
