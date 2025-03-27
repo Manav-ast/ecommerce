@@ -4,10 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Services\InvoiceService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserProfileController extends Controller
 {
+    protected $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
     /**
      * Display the user profile dashboard.
      */
@@ -45,5 +55,42 @@ class UserProfileController extends Controller
         return response()->json([
             'html' => view('user.profile.order-details', compact('order'))->render()
         ]);
+    }
+
+    /**
+     * Download invoice for a specific order
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadInvoice($id)
+    {
+        try {
+            Log::info("Downloading invoice for order ID: " . $id . " by user: " . Auth::id());
+
+            $order = Order::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->with('invoice')
+                ->firstOrFail();
+
+            if (!$order->invoice) {
+                Log::error("No invoice available for order ID: " . $id);
+                return back()->with('error', 'No invoice available for this order.');
+            }
+
+            $pdfPath = $this->invoiceService->getInvoicePDFPath($order->invoice);
+
+            if (!$pdfPath || !Storage::exists('public/' . $pdfPath)) {
+                Log::error("Invoice file not found at path: " . $pdfPath);
+                return back()->with('error', 'Invoice file not found.');
+            }
+
+            Log::info("Invoice file found, initiating download...");
+
+            return Storage::download('public/' . $pdfPath, $order->invoice->invoice_number . '.pdf');
+        } catch (\Exception $e) {
+            Log::error("Error downloading invoice: " . $e->getMessage());
+            return back()->with('error', 'Error downloading invoice.');
+        }
     }
 }

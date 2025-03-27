@@ -10,27 +10,30 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Auth\DuplicateCheckController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\UserProfileController;
 
-
+// Guest routes (accessible only when not logged in)
 Route::middleware("guest:user")->group(function () {
     Route::get("/login", [LoginController::class, "index"])->name("user.login");
     Route::post("/login", [LoginController::class, "authenticate"])->name("user.authenticate");
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('user.register');
-    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/register', [RegisterController::class, 'register'])->name('user.register.submit');
 
     Route::post('/check-email', [DuplicateCheckController::class, 'checkEmail']);
     Route::post('/check-phone', [DuplicateCheckController::class, 'checkPhone']);
 });
 
-
+// Authenticated routes (accessible only when logged in)
 Route::middleware("auth:user")->group(function () {
     Route::get("logout", [LoginController::class, "logout"])->name("user.logout");
 
     // Homepage Route
     Route::get("/", [HomepageController::class, "index"])->name("home");
 
-    // Navbar (or Global Categories) Route (Change Path)
-    Route::get("/categories", [CategoryController::class, "index"])->name("categories.list");
+    // User Profile Routes
+    Route::get('/profile', [UserProfileController::class, 'index'])->name('profile.dashboard');
+    Route::get('/profile/orders', [UserProfileController::class, 'orders'])->name('profile.orders');
+    Route::get('/profile/orders/{id}/details', [UserProfileController::class, 'orderDetails'])->name('profile.order.details');
 
     // Shop & Products Routes
     Route::get("/shop", [ProductController::class, "index"])->name("shop.index");
@@ -48,11 +51,11 @@ Route::middleware("auth:user")->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-    // User Profile Routes
-    Route::get('/profile', [\App\Http\Controllers\UserProfileController::class, 'index'])->name('profile.dashboard');
-    Route::get('/profile/orders', [\App\Http\Controllers\UserProfileController::class, 'orders'])->name('profile.orders');
-    Route::get('/profile/orders/{id}/details', [\App\Http\Controllers\UserProfileController::class, 'orderDetails']);
-
-
+    // Other Routes
     Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');
+});
+
+Route::middleware(['auth:user'])->group(function () {
+    Route::get('/orders/{order}/invoice/download', [UserProfileController::class, 'downloadInvoice'])
+        ->name('user.invoice.download');
 });

@@ -44,7 +44,7 @@ class Authenticate implements AuthenticatesRequests
      */
     public static function using($guard, ...$others)
     {
-        return static::class.':'.implode(',', [$guard, ...$others]);
+        return static::class . ':' . implode(',', [$guard, ...$others]);
     }
 
     /**
@@ -93,7 +93,7 @@ class Authenticate implements AuthenticatesRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $guards
-     * @return never
+     * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -102,7 +102,7 @@ class Authenticate implements AuthenticatesRequests
         throw new AuthenticationException(
             'Unauthenticated.',
             $guards,
-            $request->expectsJson() ? null : $this->redirectTo($request, $guards),
+            $this->redirectTo($request)
         );
     }
 
@@ -112,16 +112,17 @@ class Authenticate implements AuthenticatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
-    protected function redirectTo(Request $request, $guards)
+    protected function redirectTo(Request $request): ?string
     {
-        if(in_array("user", $guards)) {
-            return route("user.login");
-        } else if(in_array("admin", $guards)) {
-            return route("admin.login");
+        if ($request->expectsJson()) {
+            return null;
         }
-        // if (static::$redirectToCallback) {
-        //     return call_user_func(static::$redirectToCallback, $request);
-        // }
+
+        if ($request->is('admin/*')) {
+            return route('admin.login');
+        }
+
+        return route('user.login');
     }
 
     /**

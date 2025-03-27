@@ -5,10 +5,19 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\InvoiceService;
 use \Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AdminOrderController extends Controller
 {
+    protected $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -175,6 +184,34 @@ class AdminOrderController extends Controller
         } catch (\Exception $e) {
             Log::error("Error updating order status: " . $e->getMessage());
             return response()->json(['error' => 'Something went wrong while updating order status.'], 500);
+        }
+    }
+
+    /**
+     * Download invoice for a specific order
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadInvoice($id)
+    {
+        try {
+            $order = Order::with('invoice')->findOrFail($id);
+
+            if (!$order->invoice) {
+                return back()->with('error', 'No invoice available for this order.');
+            }
+
+            $pdfPath = $this->invoiceService->getInvoicePDFPath($order->invoice);
+
+            if (!$pdfPath || !Storage::exists('public/' . $pdfPath)) {
+                return back()->with('error', 'Invoice file not found.');
+            }
+
+            return Storage::download('public/' . $pdfPath, $order->invoice->invoice_number . '.pdf');
+        } catch (\Exception $e) {
+            Log::error("Error downloading invoice: " . $e->getMessage());
+            return back()->with('error', 'Error downloading invoice.');
         }
     }
 }

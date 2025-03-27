@@ -9,6 +9,8 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
+use App\Services\InvoiceService;
+use Illuminate\Support\Facades\Storage;
 
 class OrderConfirmationEmail extends Mailable implements ShouldQueue
 {
@@ -63,6 +65,17 @@ class OrderConfirmationEmail extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        return [];
+        $attachments = [];
+
+        if ($this->order->invoice) {
+            $invoiceService = new InvoiceService();
+            $pdfPath = $invoiceService->getInvoicePDFPath($this->order->invoice);
+
+            if ($pdfPath && Storage::exists('public/' . $pdfPath)) {
+                $attachments[] = Storage::path('public/' . $pdfPath);
+            }
+        }
+
+        return $attachments;
     }
 }

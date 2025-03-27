@@ -15,10 +15,12 @@ use Illuminate\Support\Facades\Mail;
 class CheckoutService
 {
     protected $cartService;
+    protected $invoiceService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, InvoiceService $invoiceService)
     {
         $this->cartService = $cartService;
+        $this->invoiceService = $invoiceService;
     }
 
     /**
@@ -59,11 +61,15 @@ class CheckoutService
             // Save billing address
             $this->saveAddress($data, $order);
 
+            // Generate invoice
+            $invoice = $this->invoiceService->generateInvoice($order);
+
             // Log successful order creation for debugging
             Log::info('Order created successfully', [
                 'order_id' => $order->id,
                 'user_id' => Auth::id(),
-                'total_price' => $totalPrice
+                'total_price' => $totalPrice,
+                'invoice_number' => $invoice->invoice_number
             ]);
 
             // Clear cart

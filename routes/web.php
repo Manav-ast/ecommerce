@@ -7,11 +7,17 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\DuplicateCheckController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminStaticBlockController;
 use App\Http\Controllers\Admin\AdminPageBlockController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\UserProfileController;
+
+// Redirect base login route to user login
+Route::redirect('/login', '/user/login')->name('login');
+Route::redirect('/register', '/user/register')->name('register');
 
 @require('user.php');
 
@@ -95,4 +101,10 @@ Route::prefix("admin")->group(function () {
         Route::delete('/page-blocks/{id}', [AdminPageBlockController::class, 'destroy'])->name('admin.page_blocks.destroy');
         Route::get('/page-blocks/search', [AdminPageBlockController::class, 'search'])->name('admin.page_blocks.search');
     });
+});
+
+// Admin invoice routes
+Route::middleware("auth:admin")->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/orders/{order}/invoice/download', [App\Http\Controllers\Admin\AdminOrderController::class, 'downloadInvoice'])
+        ->name('orders.invoice.download');
 });
