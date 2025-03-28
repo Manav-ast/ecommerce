@@ -36,6 +36,7 @@
     <x-users.footer :footerBlock="getStaticBlock('footer-test')" :footerLinks="getStaticBlock('footer-link')" />
     <x-users.copy-right />
 
+    <x-users.scripts />
     @stack('scripts')
 </body>
 

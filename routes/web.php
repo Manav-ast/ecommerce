@@ -14,6 +14,11 @@ use App\Http\Controllers\Admin\AdminStaticBlockController;
 use App\Http\Controllers\Admin\AdminPageBlockController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\SearchController;
+
+// Search routes
+Route::get('/search', [SearchController::class, 'searchPage']);
+Route::get('/search/products', [SearchController::class, 'search']);
 
 // Redirect base login route to user login
 Route::redirect('/login', '/user/login')->name('login');

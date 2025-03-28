@@ -11,6 +11,10 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Auth\DuplicateCheckController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\SearchController;
+
+// Search routes
+
 
 // Guest routes (accessible only when not logged in)
 Route::middleware("guest:user")->group(function () {
@@ -25,6 +29,9 @@ Route::middleware("guest:user")->group(function () {
 
 // Authenticated routes (accessible only when logged in)
 Route::middleware("auth:user")->group(function () {
+    Route::get('/search', [SearchController::class, 'searchPage']);
+    Route::get('/search/products', [SearchController::class, 'search']);
+    
     Route::get("logout", [LoginController::class, "logout"])->name("user.logout");
 
     // Homepage Route

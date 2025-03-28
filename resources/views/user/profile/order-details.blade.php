@@ -129,6 +129,7 @@
                 @php
                     $billingAddress = $order->addresses->where('type', 'billing')->first();
                 @endphp
+                
 
                 @if ($billingAddress)
                     <p class="text-gray-700">{{ $billingAddress->address_line1 }}</p>

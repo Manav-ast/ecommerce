@@ -21,7 +21,7 @@ class InvoiceService
         $subtotal = $order->total_price;
 
         // Calculate tax (assuming 10% tax rate)
-        $tax = $subtotal * 0.10;
+        $tax = $subtotal * 0;
 
         // Calculate total
         $total = $subtotal + $tax;
