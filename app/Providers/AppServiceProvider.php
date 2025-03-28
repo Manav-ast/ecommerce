@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CartService::class, function ($app) {
             return new CartService();
         });
+
+        // Explicitly require helpers
+        require_once app_path('Helpers/helpers.php');
     }
 
     /**

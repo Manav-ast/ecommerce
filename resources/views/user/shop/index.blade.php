@@ -54,6 +54,9 @@
                 </div>
             </section>
         </div>
+        <div>
+            {{ $products->links() }}
+        </div>
     </div>
 
     <!-- JavaScript for Filtering -->

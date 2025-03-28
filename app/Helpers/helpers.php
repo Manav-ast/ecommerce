@@ -1,10 +1,14 @@
 <?php
 
 use App\Models\StaticBlock;
-use App\Models\PageBlock;
-if (!function_exists('getFooterBlock')) {
+
+if (!function_exists('getStaticBlock')) {
     function getStaticBlock($slug = 'footer-test')
     {
-        return StaticBlock::where('slug', $slug)->where('status', 'active')->first();
+        try {
+            return StaticBlock::where('slug', $slug)->where('status', StaticBlock::ACTIVE_STATUS)->first();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

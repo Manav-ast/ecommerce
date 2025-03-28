@@ -12,11 +12,10 @@ class PageController extends Controller
     {
         try{
             $page = PageBlock::where('slug', $slug)->where('status', PageBlock::ACTIVE_STATUS)->first();
-            if ($page) {
-                return view('pages.page', compact('page'));
-            } else {
+            if (!$page) {
                 abort(404);
             }
+            return view('pages.page', compact('page'));
         }
         catch(\Exception $e){
             Log::error($e->getMessage());

@@ -116,7 +116,7 @@
                 <td>${{ number_format($invoice->subtotal, 2) }}</td>
             </tr>
             <tr>
-                <td>Tax (10%):</td>
+                <td>Tax:</td>
                 <td>${{ number_format($invoice->tax, 2) }}</td>
             </tr>
             <tr>

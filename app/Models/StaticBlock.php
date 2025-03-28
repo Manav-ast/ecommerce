@@ -12,6 +12,8 @@ class StaticBlock extends Model
 
     protected $table = 'static_blocks';
 
+    const ACTIVE_STATUS = 'active';
+
     protected $fillable = [
         'slug',
         'title',

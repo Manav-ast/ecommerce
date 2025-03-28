@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Events\OrderCreatedEvent;
 
 class CheckoutService
 {
@@ -78,12 +79,12 @@ class CheckoutService
             // Commit transaction
             DB::commit();
 
-            // Send order confirmation email
+            // Fire event to send order confirmation emails
             try {
-                Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmationEmail($order));
+                event(new OrderCreatedEvent($order));
             } catch (\Exception $e) {
-                Log::error("Failed to send order confirmation email: " . $e->getMessage());
-                // Continue with order process even if email fails
+                Log::error("Failed to fire OrderCreatedEvent: " . $e->getMessage());
+                // Continue with order process even if email event fails
             }
 
             return [

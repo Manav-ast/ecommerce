@@ -14,9 +14,7 @@ class ProductController extends Controller
     {
         try {
             $categories = Category::withCount('products')->get(); // ✅ This will add 'products_count' to each category
-            $products = Product::paginate(12); // ✅ Paginate products
-            $footerBlock = StaticBlock::where('slug', 'footer-test')->where('status', 'active')->first();
-            $footerLinks = StaticBlock::where('slug', 'footer-link')->where('status', 'active')->first();
+            $products = Product::paginate(8); // ✅ Paginate products
 
             return view('user.shop.index', compact('categories', 'products', 'footerBlock', 'footerLinks'  ));
         } catch (\Exception $e) {

@@ -51,7 +51,7 @@
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="font-medium text-gray-800">{{ ucfirst($recentAddress->type) }}
                                         Address</span>
-                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Recent</span>
+                                    {{-- <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Recent</span> --}}
                                 </div>
                                 <p class="text-sm text-gray-600">{{ $recentAddress->address_line1 }}</p>
                                 @if ($recentAddress->address_line2)
