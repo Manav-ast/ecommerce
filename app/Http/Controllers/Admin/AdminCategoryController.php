@@ -98,9 +98,6 @@ class AdminCategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
 
-            // Delete associated image
-            Storage::disk('public')->delete($category->image);
-
             // Detach related products if applicable
             if (method_exists($category, 'products')) {
                 $category->products()->detach();
