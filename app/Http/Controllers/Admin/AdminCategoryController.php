@@ -167,4 +167,52 @@ class AdminCategoryController extends Controller
             return response()->json(['error' => 'Something went wrong while searching categories.'], 500);
         }
     }
+
+    // Get trashed categories
+    public function trashed()
+    {
+        try {
+            $categories = Category::onlyTrashed()->latest()->paginate(10);
+            return view('admin.category.trashed', compact('categories'));
+        } catch (\Exception $e) {
+            Log::error("Error retrieving trashed categories: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while retrieving trashed categories.');
+        }
+    }
+
+    // Restore trashed category
+    public function restore($id)
+    {
+        try {
+            $category = Category::onlyTrashed()->findOrFail($id);
+            $category->restore();
+            return redirect()->route('admin.categories.trashed')->with('success', 'Category restored successfully!');
+        } catch (\Exception $e) {
+            Log::error("Error restoring category: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while restoring the category.');
+        }
+    }
+
+    // Force delete category
+    public function forceDelete($id)
+    {
+        try {
+            $category = Category::onlyTrashed()->findOrFail($id);
+
+            // Delete image from storage
+            Storage::disk('public')->delete($category->image);
+
+            // Detach related products if applicable
+            if (method_exists($category, 'products')) {
+                $category->products()->detach();
+            }
+
+            $category->forceDelete();
+
+            return redirect()->route('admin.categories.trashed')->with('success', 'Category permanently deleted!');
+        } catch (\Exception $e) {
+            Log::error("Error permanently deleting category: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while permanently deleting the category.');
+        }
+    }
 }

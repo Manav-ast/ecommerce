@@ -7,8 +7,14 @@
 
         <!-- Search and Add Button -->
         <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-            <input type="text" id="searchInput" placeholder="Search Categories"
-                class="border p-2 rounded-md w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="flex items-center space-x-4">
+                <input type="text" id="searchInput" placeholder="Search Categories"
+                    class="border p-2 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <a href="{{ route('admin.categories.trashed') }}"
+                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition">
+                    <i class="uil uil-trash-alt"></i> Trashed Categories
+                </a>
+            </div>
             <a href="{{ route('admin.categories.create') }}"
                 class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
                 <i class="uil uil-plus"></i> Category
@@ -79,9 +85,9 @@
             $("#searchInput").on("keyup", function() {
                 clearTimeout(searchTimer); // Clear any existing timer
 
-                searchTimer = setTimeout(() => {    
+                searchTimer = setTimeout(() => {
                     let query = $(this).val().trim(); // Remove extra spaces
-    
+
                     $.ajax({
                         url: "{{ route('admin.categories.search') }}",
                         type: "GET",
@@ -90,7 +96,8 @@
                         }, // ✅ Use `q` instead of `search`
                         dataType: "json", // ✅ Expect JSON response
                         success: function(data) {
-                            $("#categoryTable").html(data.html); // ✅ Inject new table content
+                            $("#categoryTable").html(data
+                            .html); // ✅ Inject new table content
                         },
                         error: function(xhr, status, error) {
                             console.error("Search Error:", error);

@@ -125,6 +125,54 @@ class AdminProductController extends Controller
         }
     }
 
+    // Get trashed products
+    public function trashed()
+    {
+        try {
+            $products = Product::onlyTrashed()->with('categories')->latest()->paginate(10);
+            return view('admin.products.trashed', compact('products'));
+        } catch (\Exception $e) {
+            Log::error("Error retrieving trashed products: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while retrieving trashed products.');
+        }
+    }
+
+    // Restore trashed product
+    public function restore($id)
+    {
+        try {
+            $product = Product::onlyTrashed()->findOrFail($id);
+            $product->restore();
+            return redirect()->route('admin.products.trashed')->with('success', 'Product restored successfully!');
+        } catch (\Exception $e) {
+            Log::error("Error restoring product: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while restoring the product.');
+        }
+    }
+
+    // Force delete product
+    public function forceDelete($id)
+    {
+        try {
+            $product = Product::onlyTrashed()->findOrFail($id);
+
+            // Delete image from storage
+            Storage::disk('public')->delete($product->image);
+
+            // Detach related categories if applicable
+            if (method_exists($product, 'categories')) {
+                $product->categories()->detach();
+            }
+
+            $product->forceDelete();
+
+            return redirect()->route('admin.products.trashed')->with('success', 'Product permanently deleted!');
+        } catch (\Exception $e) {
+            Log::error("Error permanently deleting product: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while permanently deleting the product.');
+        }
+    }
+
     // Search products via AJAX
     public function search(Request $request)
     {

@@ -47,6 +47,10 @@ Route::prefix("admin")->group(function () {
         Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
         Route::get('/categories/search', [AdminCategoryController::class, 'search'])->name('admin.categories.search');
         Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
+        // Soft delete functionality for categories
+        Route::get('/categories/trashed', [AdminCategoryController::class, 'trashed'])->name('admin.categories.trashed');
+        Route::post('/categories/{id}/restore', [AdminCategoryController::class, 'restore'])->name('admin.categories.restore');
+        Route::delete('/categories/{id}/force-delete', [AdminCategoryController::class, 'forceDelete'])->name('admin.categories.force-delete');
 
         //Admin products routes
         Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products');
@@ -56,6 +60,10 @@ Route::prefix("admin")->group(function () {
         Route::put('/products/update/{id}', [AdminProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/products/{id}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::get('/products/search', [AdminProductController::class, 'search'])->name('admin.products.search');
+        // Soft delete functionality
+        Route::get('/products/trashed', [AdminProductController::class, 'trashed'])->name('admin.products.trashed');
+        Route::post('/products/{id}/restore', [AdminProductController::class, 'restore'])->name('admin.products.restore');
+        Route::delete('/products/{id}/force-delete', [AdminProductController::class, 'forceDelete'])->name('admin.products.force-delete');
 
         //Admin orders routes
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders');

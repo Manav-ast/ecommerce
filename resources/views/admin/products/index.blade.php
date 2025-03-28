@@ -7,8 +7,14 @@
 
         <!-- Search and Add Button -->
         <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-            <input type="text" id="searchInput" placeholder="Search Products"
-                class="border p-2 rounded-md w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="flex items-center space-x-4">
+                <input type="text" id="searchInput" placeholder="Search Products"
+                    class="border p-2 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <a href="{{ route('admin.products.trashed') }}"
+                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition">
+                    <i class="uil uil-trash-alt"></i> Trashed Products
+                </a>
+            </div>
             <a href="{{ route('admin.products.create') }}"
                 class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
                 <i class="uil uil-plus"></i> Product
@@ -133,7 +139,7 @@
                     .then(response => response.json()) // Expect JSON response
                     .then(data => {
                         document.getElementById("productTableBody").innerHTML = data
-                        .html; // Inject HTML response
+                            .html; // Inject HTML response
                     })
                     .catch(error => console.error("Fetch error:", error));
             }, 500); // 500ms debounce delay
