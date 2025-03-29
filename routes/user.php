@@ -15,6 +15,10 @@ use App\Http\Controllers\SearchController;
 
 // Search routes
 
+// Shop & Products Routes - Public access
+Route::get("/shop", [ProductController::class, "index"])->name("shop.index");
+Route::get('/shop/filter', [ProductController::class, 'filter'])->name('shop.filter');
+Route::get("/products/{slug}", [ProductController::class, "show"])->name("shop.show");
 
 // Guest routes (accessible only when not logged in)
 Route::middleware("guest:user")->group(function () {
@@ -29,9 +33,7 @@ Route::middleware("guest:user")->group(function () {
 
 // Authenticated routes (accessible only when logged in)
 Route::middleware("auth:user")->group(function () {
-    Route::get('/search', [SearchController::class, 'searchPage']);
-    Route::get('/search/products', [SearchController::class, 'search']);
-    
+
     Route::get("logout", [LoginController::class, "logout"])->name("user.logout");
 
     // Homepage Route
@@ -41,11 +43,6 @@ Route::middleware("auth:user")->group(function () {
     Route::get('/profile', [UserProfileController::class, 'index'])->name('profile.dashboard');
     Route::get('/profile/orders', [UserProfileController::class, 'orders'])->name('profile.orders');
     Route::get('/profile/orders/{id}/details', [UserProfileController::class, 'orderDetails'])->name('profile.order.details');
-
-    // Shop & Products Routes
-    Route::get("/shop", [ProductController::class, "index"])->name("shop.index");
-    Route::get('/shop/filter', [ProductController::class, 'filter'])->name('shop.filter');
-    Route::get("/products/{slug}", [ProductController::class, "show"])->name("shop.show");
 
     // Cart Routes
     Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');
@@ -58,7 +55,11 @@ Route::middleware("auth:user")->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-    // Other Routes
+    // Search Routes
+    Route::get('/search', [SearchController::class, 'searchPage']);
+    Route::get('/search/products', [SearchController::class, 'search']);
+
+    // Other Routes - Catch-all route should be last
     Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');
 });
 

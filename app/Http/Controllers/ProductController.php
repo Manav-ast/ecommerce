@@ -16,7 +16,7 @@ class ProductController extends Controller
             $categories = Category::withCount('products')->get(); // ✅ This will add 'products_count' to each category
             $products = Product::paginate(8); // ✅ Paginate products
 
-            return view('user.shop.index', compact('categories', 'products', 'footerBlock', 'footerLinks'  ));
+            return view('user.shop.index', compact('categories', 'products'));
         } catch (\Exception $e) {
             Log::error("Error fetching products and categories: " . $e->getMessage());
             return back()->with('error', 'Something went wrong while loading products.');
