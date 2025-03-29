@@ -44,6 +44,8 @@ Route::middleware("auth:user")->group(function () {
     Route::get('/profile/orders', [UserProfileController::class, 'orders'])->name('profile.orders');
     Route::get('/profile/orders/{id}/details', [UserProfileController::class, 'orderDetails'])->name('profile.order.details');
     Route::get('/profile/addresses', [UserProfileController::class, 'addresses'])->name('profile.addresses');
+    Route::get('/profile/edit', [UserProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
 
     // Cart Routes
     Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');

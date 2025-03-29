@@ -122,7 +122,8 @@
                                 </div>
                             </div>
                             <div class="mt-6">
-                                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit Account
+                                <a href="{{ route('profile.edit') }}"
+                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit Account
                                     Details</a>
                             </div>
                         </div>
