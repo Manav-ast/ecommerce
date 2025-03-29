@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Address;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -92,5 +93,14 @@ class UserProfileController extends Controller
             Log::error("Error downloading invoice: " . $e->getMessage());
             return back()->with('error', 'Error downloading invoice.');
         }
+    }
+
+    /**
+     * Display the user's addresses.
+     */
+    public function addresses()
+    {
+        $user = Auth::user();
+        return view('user.profile.addresses', compact('user'));
     }
 }

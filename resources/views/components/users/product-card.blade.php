@@ -76,6 +76,9 @@
                     if (data.cart_count > 0) {
                         cartCountElement.classList.remove("hidden");
                     }
+
+                    // Show success toast notification
+                    showSuccessToast('Product added to cart successfully!');
                 }
             })
             .catch(error => console.error("Error:", error));

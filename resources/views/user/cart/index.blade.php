@@ -42,6 +42,9 @@
         </div>
     </div>
 
+    <!-- Include Delete Confirmation Modal -->
+    @include('user.cart.partials.delete-confirmation-modal')
+
     <!-- JavaScript for Updating Cart -->
     <script>
         function updateCart(productId, action) {
@@ -73,7 +76,30 @@
                 });
         }
 
+        // Store the product ID to be deleted
+        let productIdToDelete = null;
+
+        // Show delete confirmation modal
         function removeFromCart(productId) {
+            // Store the product ID for later use
+            productIdToDelete = productId;
+
+            // Show the modal
+            document.getElementById("deleteCartItemModal").classList.remove("hidden");
+
+            // Set up the confirm button to call the actual delete function
+            document.getElementById("confirmDeleteBtn").onclick = function() {
+                performCartItemDeletion(productIdToDelete);
+            };
+        }
+
+        // Close the delete confirmation modal
+        function closeDeleteModal() {
+            document.getElementById("deleteCartItemModal").classList.add("hidden");
+        }
+
+        // Actual function to remove item from cart
+        function performCartItemDeletion(productId) {
             fetch("{{ url('/cart/remove') }}", {
                     method: "POST",
                     headers: {
@@ -87,6 +113,10 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        // Close the modal
+                        closeDeleteModal();
+
+                        // Update the cart display
                         document.getElementById("cart-items").innerHTML = data.cartHtml;
                         document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
 
@@ -97,6 +127,9 @@
                         } else {
                             cartCountElement.classList.remove("hidden");
                         }
+
+                        // Show success message
+                        showSuccessToast('Item removed from cart successfully!');
                     }
                 });
         }

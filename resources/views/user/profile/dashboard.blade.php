@@ -33,7 +33,7 @@
                             <i class="fa-solid fa-user-edit w-5 h-5"></i>
                             <span>Account Details</span>
                         </a>
-                        <a href="#"
+                        <a href="{{ route('profile.addresses') }}"
                             class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
                             <i class="fa-solid fa-map-marker-alt w-5 h-5"></i>
                             <span>Addresses</span>
