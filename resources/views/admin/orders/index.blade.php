@@ -1,75 +1,88 @@
 @extends('admin.dashboard')
 
 @section('content')
-    <div class="p-10">
+    <div class="p-4 md:p-10">
         <!-- Page Title -->
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">Orders</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">Orders</h2>
 
-        <!-- Search Bar -->
-        <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
+        <!-- Search Bar - Responsive -->
+        <div class="flex justify-between items-center bg-white p-3 md:p-4 rounded-lg shadow-md">
             <input type="text" id="searchInput" placeholder="Search Orders"
-                class="border p-2 rounded-md w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="border p-2 rounded-md w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
-        <!-- Orders Table -->
-        <div class="mt-6 bg-white shadow-md rounded-lg overflow-hidden">
-            <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
-                <thead class="bg-gray-100 border-b border-gray-200">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-gray-600">Order ID</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Customer</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Status</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Total Price</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Order Date</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="orderTableBody">
-                    @foreach ($orders as $order)
-                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition"
-                            data-order-id="{{ $order->id }}">
-                            <td class="px-6 py-3 text-gray-800">{{ $order->id }}</td>
-                            <td class="px-6 py-3 text-gray-800">{{ $order->user->name ?? 'Guest' }}</td>
-                            <td class="px-6 py-3">
-                                <span
-                                    class="px-2 py-1 rounded-lg text-white 
-                                    {{ $order->order_status == 'pending'
-                                        ? 'bg-yellow-500'
-                                        : ($order->order_status == 'shipped'
-                                            ? 'bg-blue-500'
-                                            : ($order->order_status == 'delivered'
-                                                ? 'bg-green-500'
-                                                : 'bg-red-500')) }} ">
-                                    {{ ucfirst($order->order_status) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-3 text-gray-600">${{ number_format($order->total_price, 2) }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ date('d M, Y', strtotime($order->order_date)) }}</td>
-                            <td class="px-12 py-3 flex space-x-4">
-                                <!-- View Button -->
-                                <button type="button" onclick="openViewModal({{ $order->id }})"
-                                    class="text-green-500 hover:text-green-700 transition">
-                                    <i class="uil uil-eye"></i>
-                                </button>
-
-
-                                <!-- Edit Button -->
-                                {{-- <a href="{{ route('admin.orders.edit', $order->id) }}"
-                                    class="text-blue-500 hover:text-blue-700 transition">
-                                    <i class="uil uil-edit"></i>
-                                </a>
-
-                                <!-- Delete Button -->
-                                <button type="button"
-                                    onclick="openDeleteModal({{ $order->id }}, 'Order #{{ $order->id }}')"
-                                    class="text-red-500 hover:text-red-700 transition">
-                                    <i class="uil uil-trash-alt"></i>
-                                </button> --}}
-                            </td>
+        <!-- Orders Table - Responsive Design -->
+        <div class="mt-4 md:mt-6 bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full border border-gray-200 rounded-lg">
+                    <thead class="bg-gray-100 border-b border-gray-200">
+                        <tr>
+                            <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
+                                Order ID</th>
+                            <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
+                                Customer</th>
+                            <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
+                                Status</th>
+                            <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
+                                Total</th>
+                            <th
+                                class="hidden md:table-cell px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
+                                Date</th>
+                            <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
+                                Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        @foreach ($orders as $order)
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition"
+                                data-order-id="{{ $order->id }}">
+                                <td class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-800">#{{ $order->id }}
+                                </td>
+                                <td
+                                    class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-800 max-w-[80px] md:max-w-none truncate">
+                                    {{ $order->user->name ?? 'Guest' }}</td>
+                                <td class="px-3 md:px-6 py-2 md:py-3">
+                                    <span
+                                        class="px-1.5 md:px-2 py-0.5 md:py-1 rounded-lg text-white text-xs md:text-sm
+                                        {{ $order->order_status == 'pending'
+                                            ? 'bg-yellow-500'
+                                            : ($order->order_status == 'shipped'
+                                                ? 'bg-blue-500'
+                                                : ($order->order_status == 'delivered'
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500')) }} ">
+                                        {{ ucfirst($order->order_status) }}
+                                    </span>
+                                </td>
+                                <td class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-600">
+                                    ${{ number_format($order->total_price, 2) }}</td>
+                                <td class="hidden md:table-cell px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-600">
+                                    {{ date('d M, Y', strtotime($order->order_date)) }}</td>
+                                <td class="px-3 md:px-12 py-2 md:py-3 flex space-x-2 md:space-x-4">
+                                    <!-- View Button -->
+                                    <button type="button" onclick="openViewModal({{ $order->id }})"
+                                        class="text-green-500 hover:text-green-700 transition p-1">
+                                        <i class="uil uil-eye"></i>
+                                    </button>
+
+                                    <!-- Edit Button -->
+                                    {{-- <a href="{{ route('admin.orders.edit', $order->id) }}"
+                                        class="text-blue-500 hover:text-blue-700 transition">
+                                        <i class="uil uil-edit"></i>
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <button type="button"
+                                        onclick="openDeleteModal({{ $order->id }}, 'Order #{{ $order->id }}')"
+                                        class="text-red-500 hover:text-red-700 transition">
+                                        <i class="uil uil-trash-alt"></i>
+                                    </button> --}}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Pagination -->

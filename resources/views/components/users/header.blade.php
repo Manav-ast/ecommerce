@@ -1,12 +1,12 @@
 <header class="py-3 shadow-sm bg-white sticky top-0 z-50">
-    <div class="container mx-auto px-6 flex items-center justify-between gap-8">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
         <!-- Logo -->
         <a href="{{ url('/') }}" class="flex-shrink-0">
             <img src="{{ asset('assets/images/logo.svg') }}" alt="Company Logo" class="w-28 h-auto" loading="lazy">
         </a>
 
         <!-- Search Bar -->
-        <div class="flex-grow max-w-2xl relative">
+        <div class="flex-grow w-full md:max-w-2xl relative">
             <form class="relative flex items-center" action="{{ url('/search') }}" method="GET">
                 <label for="search" class="sr-only">Search products</label>
                 <input type="text" name="search" id="search"

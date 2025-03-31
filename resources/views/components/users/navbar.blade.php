@@ -1,5 +1,5 @@
 <nav class="bg-blue-500 z-20">
-    <div class="container flex items-center">
+    <div class="container flex items-center justify-between relative">
         <!-- Categories Dropdown (Hidden on small screens) -->
         <!-- Categories Dropdown (Hidden on small screens) -->
         <div class="px-8 py-4 bg-blue-900 items-center cursor-pointer relative group hidden md:block">
@@ -23,12 +23,18 @@
         </div>
 
 
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobile-menu-toggle" class="md:hidden text-white focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+
         <!-- Main Navigation Links -->
         <div class="flex items-center justify-between flex-grow md:pl-12 py-5">
-            <div class="flex items-center space-x-6 capitalize">
+            <div class="hidden md:flex items-center space-x-6 capitalize">
                 <a href="/" class="text-white hover:text-blue-200 transition">Home</a>
                 <a href="{{ route('shop.index') }}" class="text-white hover:text-blue-200 transition">Shop</a>
-                <a href="{{ route('page.show', 'contact-us') }}" class="text-white hover:text-blue-200 transition">Contact Us</a>
+                <a href="{{ route('page.show', 'contact-us') }}"
+                    class="text-white hover:text-blue-200 transition">Contact Us</a>
             </div>
 
             <!-- Authentication -->
@@ -54,6 +60,42 @@
                     </div> --}}
                 </div>
             @endguest
+        </div>
+    </div>
+    <!-- Mobile Menu (Hidden by default) -->
+    <div id="mobile-menu" class="fixed inset-0 bg-gray-800 bg-opacity-75 z-50 hidden">
+        <div class="h-full w-64 bg-blue-600 p-5 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white">Menu</h2>
+                <button id="close-mobile-menu" class="text-white focus:outline-none">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Links -->
+            <div class="flex flex-col space-y-4">
+                <a href="/"
+                    class="text-white hover:text-blue-200 transition py-2 border-b border-blue-500">Home</a>
+                <a href="{{ route('shop.index') }}"
+                    class="text-white hover:text-blue-200 transition py-2 border-b border-blue-500">Shop</a>
+                <a href="{{ route('page.show', 'contact-us') }}"
+                    class="text-white hover:text-blue-200 transition py-2 border-b border-blue-500">Contact Us</a>
+            </div>
+
+            <!-- Mobile Categories -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-white mb-3">Categories</h3>
+                <div class="flex flex-col space-y-2">
+                    @foreach ($categories as $category)
+                        <a href="{{ url('/shop?category=' . $category->slug) }}"
+                            class="flex items-center py-2 text-white hover:text-blue-200 transition">
+                            <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
+                                class="w-5 h-5 object-contain">
+                            <span class="ml-3 text-sm">{{ $category->name }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
         </div>
     </div>
 </nav>
