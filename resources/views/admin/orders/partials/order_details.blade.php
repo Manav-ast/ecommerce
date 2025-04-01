@@ -1,4 +1,4 @@
-<div class="space-y-4 max-h-[80vh] overflow-y-auto">
+<div class="space-y-4 max-h-[80vh] overflow-auto">
 
     <div class="pb-4">
         <!-- Order Status Toggle Section -->

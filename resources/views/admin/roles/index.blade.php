@@ -1,22 +1,22 @@
 @extends('admin.dashboard')
 
 @section('content')
-    <div class="p-10">
+    <div class="p-4 md:p-10">
         <!-- Page Title -->
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">Roles</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">Roles</h2>
 
         <!-- Search and Add Button -->
-        <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-md">
             <input type="text" id="searchInput" placeholder="Search Roles"
-                class="border p-2 rounded-md w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="border p-2 rounded-md w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <a href="{{ route('admin.roles.create') }}"
-                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+                class="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition text-center">
                 <i class="uil uil-plus"></i> Add Role
             </a>
         </div>
 
-        <!-- Roles Table -->
-        <div class="mt-6 bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Roles Table (Desktop) -->
+        <div class="hidden md:block mt-6 bg-white shadow-md rounded-lg overflow-hidden">
             <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
                 <thead class="bg-gray-100 border-b border-gray-200">
                     <tr>
@@ -51,6 +51,32 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Roles Cards (Mobile) -->
+        <div class="md:hidden mt-6 space-y-4" id="roleMobileCards">
+            @foreach ($roles as $role)
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">#{{ $role->id }} - {{ $role->role_name }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">{{ $role->description ?? 'No description' }}</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <a href="{{ route('admin.roles.edit', $role->id) }}"
+                                class="text-blue-500 hover:text-blue-700 transition">
+                                <i class="uil uil-edit"></i>
+                            </a>
+                            <button type="button"
+                                onclick="openDeleteModal({{ $role->id }}, '{{ $role->role_name }}')"
+                                class="text-red-500 hover:text-red-700 transition">
+                                <i class="uil uil-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
         <!-- Pagination -->
         <div class="mt-6">
             {{ $roles->links() }}
@@ -119,34 +145,15 @@
                     })
                     .then(response => response.json()) // Expect JSON response
                     .then(data => {
-                        document.getElementById("roleTableBody").innerHTML = data
-                        .html; // Inject new table content
+                        // Update both desktop and mobile views
+                        const desktopTableBody = document.getElementById("roleTableBody");
+                        const mobileView = document.getElementById("roleMobileCards");
+
+                        if (desktopTableBody) desktopTableBody.innerHTML = data.html;
+                        if (mobileView) mobileView.innerHTML = data.mobileHtml;
                     })
                     .catch(error => console.error("Fetch error:", error));
             }, 500); // 500ms debounce delay
         });
-
-
-        // document.getElementById("searchInput").addEventListener("keyup", function() {
-        //     clearTimeout(searchTimer); // Clear any existing timer
-
-        //     // Set a new timer to delay the search execution
-        //     searchTimer = setTimeout(() => {
-        //         let query = this.value.trim(); // Remove leading/trailing spaces
-
-        //         fetch("{{ route('admin.users.search') }}?q=" + encodeURIComponent(query), {
-        //                 method: "GET",
-        //                 headers: {
-        //                     "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
-        //                 }
-        //             })
-        //             .then(response => response.json()) // Expect JSON response
-        //             .then(data => {
-        //                 document.getElementById("userTableBody").innerHTML = data
-        //                 .html; // Inject new table content
-        //             })
-        //             .catch(error => console.error("Fetch error:", error));
-        //     }, 500); // 500ms debounce delay
-        // });
     </script>
 @endsection

@@ -23,7 +23,7 @@
         </div>
 
         <!-- Products Table -->
-        <div class="mt-6 bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="mt-6 bg-white shadow-md rounded-lg overflow-auto">
             <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
                 <thead class="bg-gray-100 border-b border-gray-200">
                     <tr>

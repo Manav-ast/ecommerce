@@ -1,5 +1,5 @@
 @props(['orders'])
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="bg-white rounded-lg shadow-md overflow-auto">
     <div class="p-3 md:p-4 border-b border-gray-200">
         <h3 class="text-base md:text-lg font-semibold">Recent Orders</h3>
     </div>

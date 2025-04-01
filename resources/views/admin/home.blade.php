@@ -1,4 +1,4 @@
-@extends('layouts.admin.app')
+@extends('admin.dashboard')
 
 @section('title', 'Admin Dashboard')
 
@@ -8,17 +8,18 @@
 
         <!-- Stats Cards Row - Responsive Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
-            <x-admin.stats-card title="Total Orders" value="{{ $totalOrders }}" icon="fas fa-shopping-cart"
-                color="bg-blue-100 text-blue-600" />
-
             <x-admin.stats-card title="Total Revenue" value="${{ number_format($totalRevenue, 2) }}" icon="fas fa-dollar-sign"
                 color="bg-green-100 text-green-600" />
+
+            <x-admin.stats-card title="Total Categories" value="{{ $totalCategories }}" icon="fas fa-tags"
+                color="bg-orange-100 text-orange-600" />
 
             <x-admin.stats-card title="Total Products" value="{{ $totalProducts }}" icon="fas fa-box"
                 color="bg-purple-100 text-purple-600" />
 
-            <x-admin.stats-card title="Total Users" value="{{ $totalUsers }}" icon="fas fa-users"
-                color="bg-orange-100 text-orange-600" />
+            <x-admin.stats-card title="Total Orders" value="{{ $totalOrders }}" icon="fas fa-shopping-cart"
+                color="bg-blue-100 text-blue-600" />
+
         </div>
 
         <!-- Charts and Tables Row - Responsive Layout -->

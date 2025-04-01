@@ -128,7 +128,11 @@ class AdminPageBlockController extends Controller
             ->get(); // Get all results instead of paginate for AJAX
 
         $html = view('admin.page_block.partials.table', compact('staticBlocks'))->render();
+        $mobileHtml = view('admin.page_block.partials.mobile', compact('staticBlocks'))->render();
 
-        return response()->json(['html' => $html]);
+        return response()->json([
+            'html' => $html,
+            'mobileHtml' => $mobileHtml
+        ]);
     }
 }

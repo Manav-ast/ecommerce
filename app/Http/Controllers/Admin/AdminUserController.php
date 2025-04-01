@@ -111,7 +111,7 @@ class AdminUserController extends Controller
                     ->orWhere('phone_no', 'LIKE', "%{$query}%")
                     ->get();
 
-                // Generate HTML output
+                // Generate HTML output for desktop view
                 $output = '';
                 if ($users->isNotEmpty()) {
                     foreach ($users as $user) {
@@ -132,7 +132,7 @@ class AdminUserController extends Controller
                             <a href="' . route('admin.users.edit', $user->id) . '" class="text-blue-500 hover:text-blue-700 transition">
                                 <i class="uil uil-edit"></i>
                             </a>
-                            <button type="button" onclick="openDeleteModal(' . $user->id . ', \'' . e($user->name) . '\')"
+                            <button type="button" onclick="openDeleteModal(' . $user->id . ', \'' . e($user->name) . '\')" 
                                 class="text-red-500 hover:text-red-700 transition">
                                 <i class="uil uil-trash-alt"></i>
                             </button>
@@ -143,7 +143,43 @@ class AdminUserController extends Controller
                     $output = '<tr><td colspan="6" class="text-center py-3 text-gray-600">No users found</td></tr>';
                 }
 
-                return response()->json(['html' => $output]);
+                // Generate HTML output for mobile view
+                $mobileOutput = '';
+                if ($users->isNotEmpty()) {
+                    foreach ($users as $user) {
+                        $statusClass = $user->status == 'active' ? 'bg-green-500' : 'bg-red-500';
+
+                        $mobileOutput .= '
+                        <div class="bg-white rounded-lg shadow p-4 border border-gray-200 mb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">#' . e($user->id) . ' - ' . e($user->name) . '</h3>
+                                    <p class="text-gray-600 text-sm mt-1">' . e($user->email) . '</p>
+                                    <p class="text-gray-600 text-sm mt-1">' . e($user->phone_no) . '</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-white text-sm ' . $statusClass . '">
+                                    ' . ucfirst($user->status) . '
+                                </span>
+                            </div>
+                            <div class="flex space-x-4 justify-end border-t border-gray-200 pt-3">
+                                <a href="' . route('admin.users.edit', $user->id) . '" class="text-blue-500 hover:text-blue-700 transition">
+                                    <i class="uil uil-edit"></i>
+                                </a>
+                                <button type="button" onclick="openDeleteModal(' . $user->id . ', \'' . e($user->name) . '\')" 
+                                    class="text-red-500 hover:text-red-700 transition">
+                                    <i class="uil uil-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>';
+                    }
+                } else {
+                    $mobileOutput = '<div class="bg-white rounded-lg shadow p-4 text-center text-gray-600">No users found</div>';
+                }
+
+                return response()->json([
+                    'html' => $output,
+                    'mobileHtml' => $mobileOutput
+                ]);
             }
         } catch (\Exception $e) {
             Log::error("Error searching users: " . $e->getMessage());

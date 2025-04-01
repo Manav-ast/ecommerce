@@ -127,8 +127,12 @@ class AdminStaticBlockController extends Controller
             ->orderBy('id', 'desc')
             ->get(); // Get all results instead of paginate for AJAX
 
-        $html = view('admin.static_blocks.partials.table', compact('staticBlocks'))->render();
+        $desktopHtml = view('admin.static_blocks.partials.table', compact('staticBlocks'))->render();
+        $mobileHtml = view('admin.static_blocks.partials.mobile', compact('staticBlocks'))->render();
 
-        return response()->json(['html' => $html]);
+        return response()->json([
+            'html' => $desktopHtml,
+            'mobileHtml' => $mobileHtml
+        ]);
     }
 }

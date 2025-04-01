@@ -7,8 +7,10 @@
             <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Add Category</h2>
 
             <!-- Form -->
-            <form id="addCategoryForm" enctype="multipart/form-data" class="space-y-3">
+            <form id="addCategoryForm" enctype="multipart/form-data" class="space-y-3"
+                data-action="{{ route('admin.categories.store') }}" data-redirect="{{ route('admin.categories') }}">
                 @csrf
+                <meta name="csrf-token" content="{{ csrf_token() }}">
 
                 <!-- Category Name -->
                 <div>
@@ -149,8 +151,13 @@
                         },
                         success: function(data) {
                             if (data.success) {
-                                // Show success toast notification
-                                showSuccessToast(data.message);
+                                // Check if showSuccessToast function exists before calling it
+                                if (typeof showSuccessToast === 'function') {
+                                    showSuccessToast(data.message);
+                                } else {
+                                    // Fallback if function not available
+                                    alert(data.message);
+                                }
 
                                 // Reset form after success
                                 setTimeout(function() {
@@ -164,16 +171,27 @@
                                         'hidden');
                                 });
                             } else {
-                                // Show error toast notification
-                                showErrorToast(data.message ||
-                                    'An error occurred while adding the category.');
+                                // Check if showErrorToast function exists before calling it
+                                if (typeof showErrorToast === 'function') {
+                                    showErrorToast(data.message ||
+                                        'An error occurred while adding the category.');
+                                } else {
+                                    // Fallback if function not available
+                                    alert(data.message ||
+                                        'An error occurred while adding the category.');
+                                }
                             }
                         },
                         error: function(xhr, status, error) {
                             console.error('Error:', error);
-                            // Show error toast notification
-                            showErrorToast(
-                                'An error occurred while processing your request.');
+                            // Check if showErrorToast function exists before calling it
+                            if (typeof showErrorToast === 'function') {
+                                showErrorToast(
+                                    'An error occurred while processing your request.');
+                            } else {
+                                // Fallback if function not available
+                                alert('An error occurred while processing your request.');
+                            }
                         }
                     });
                 }
@@ -182,7 +200,7 @@
             // Add additional method for file extension validation
             $.validator.addMethod("extension", function(value, element, param) {
                 param = typeof param === "string" ? param.replace(/,/g, "|") : "png|jpe?g|gif";
-                return this.optional(element) || value.match(new RegExp("\\.(" + param + ")$", "i"));
+                return this.optional(element) || value.match(new RegExp("\\.(?:" + param + ")$", "i"));
             }, "Please select a valid file with the correct extension.");
         });
     </script>

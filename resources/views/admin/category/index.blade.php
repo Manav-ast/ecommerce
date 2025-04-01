@@ -39,8 +39,6 @@
                                 class="hidden md:table-cell px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                                 Description</th>
                             <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
-                                Products</th>
-                            <th class="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                                 Actions</th>
                         </tr>
                     </thead>
@@ -61,8 +59,6 @@
                                     {{ $category->slug }}</td>
                                 <td class="hidden md:table-cell px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-600">
                                     {{ \Illuminate\Support\Str::limit($category->description, 50) }}</td>
-                                <td class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-600">
-                                    {{ $category->products_count }}</td>
                                 <td class="px-3 md:px-6 py-2 md:py-3 flex space-x-2 md:space-x-4">
                                     <!-- Edit Button -->
                                     <a href="{{ route('admin.categories.edit', $category->id) }}"

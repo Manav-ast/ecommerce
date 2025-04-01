@@ -127,6 +127,7 @@ class AdminRoleController extends Controller
                     ->orWhere('description', 'LIKE', "%{$query}%")
                     ->get();
 
+                // Desktop view HTML
                 $output = '';
                 if ($roles->isNotEmpty()) {
                     foreach ($roles as $role) {
@@ -150,7 +151,37 @@ class AdminRoleController extends Controller
                     $output = '<tr><td colspan="4" class="text-center py-3 text-gray-600">No roles found</td></tr>';
                 }
 
-                return response()->json(['html' => $output]);
+                // Mobile view HTML
+                $mobileOutput = '';
+                if ($roles->isNotEmpty()) {
+                    foreach ($roles as $role) {
+                        $mobileOutput .= '
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">#' . e($role->id) . ' - ' . e($role->role_name) . '</h3>
+                                    <p class="text-sm text-gray-600 mt-1">' . e($role->description ?? 'No description') . '</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a href="' . route('admin.roles.edit', $role->id) . '" class="text-blue-500 hover:text-blue-700 transition">
+                                        <i class="uil uil-edit"></i>
+                                    </a>
+                                    <button type="button" onclick="openDeleteModal(' . $role->id . ', \'' . e($role->role_name) . '\')"
+                                        class="text-red-500 hover:text-red-700 transition">
+                                        <i class="uil uil-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>';
+                    }
+                } else {
+                    $mobileOutput = '<div class="bg-white rounded-lg shadow-md p-4 text-center text-gray-600">No roles found</div>';
+                }
+
+                return response()->json([
+                    'html' => $output,
+                    'mobileHtml' => $mobileOutput
+                ]);
             }
         } catch (\Exception $e) {
             Log::error("Error searching roles: " . $e->getMessage());

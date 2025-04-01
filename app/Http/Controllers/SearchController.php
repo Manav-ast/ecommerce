@@ -68,7 +68,7 @@ class SearchController extends Controller
         $products = Product::where('name', 'like', "%{$query}%")
             ->orWhere('slug', 'like', "%{$query}%")
             ->with('categories')
-            ->paginate(12);
+            ->paginate(8);
 
         return view('user.shop.index', [
             'products' => $products,

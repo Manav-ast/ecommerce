@@ -21,6 +21,9 @@
     <!-- Alpine.js for sidebar toggle -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -99,7 +102,9 @@
         </script>
     @endif
 
+    <!-- Load stacked scripts first, then initialize flash messages -->
     @stack('scripts')
+    <script src="{{ asset('js/flash-messages.js') }}"></script>
 </body>
 
 </html>
