@@ -37,6 +37,8 @@
                 transform: translateX(-100%);
                 transition: transform 0.3s ease-in-out;
                 z-index: 50;
+                overflow-y: auto;
+                max-height: 100vh;
             }
 
             .mobile-sidebar.open {

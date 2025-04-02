@@ -157,7 +157,7 @@
         });
 
         function openViewModal(orderId) {
-            fetch("{{ url('/admin/orders/details') }}/" + orderId, {
+            fetch("{{ route('admin.orders.details', '') }}/" + orderId, {
                     method: "GET",
                     headers: {
                         "X-Requested-With": "XMLHttpRequest"

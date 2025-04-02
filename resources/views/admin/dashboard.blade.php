@@ -65,6 +65,11 @@
                     </button>
                     <div class="text-lg font-semibold text-gray-800">Admin Dashboard</div>
                 </div>
+
+                <!-- Welcome message moved to right side -->
+                <div class="text-sm text-indigo-600 font-medium">
+                    Welcome, {{ Auth::guard('admin')->user()->name }}
+                </div>
             </header>
 
             <!-- Page Content -->

@@ -1,5 +1,5 @@
 <!-- resources/views/components/admin/sidebar.blade.php -->
-<aside class="h-full bg-white shadow-md p-3 md:p-6 flex flex-col overflow-y-auto">
+<aside class="h-full bg-white shadow-md p-3 md:p-6 flex flex-col">
     <div class="flex items-center justify-between mb-4 md:mb-6">
         <h2 class="text-lg md:text-xl font-semibold text-gray-800">Admin Panel</h2>
         <button @click="sidebarOpen = false"
@@ -7,7 +7,7 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <nav class="space-y-1 md:space-y-2 w-full">
+    <nav class="space-y-1 md:space-y-2 w-full overflow-y-auto flex-grow">
         <a href="{{ route('admin.dashboard') }}"
             class="flex items-center space-x-3 p-2 md:p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition w-full">
             <i class="fas fa-tachometer-alt w-5 h-5 flex-shrink-0"></i>

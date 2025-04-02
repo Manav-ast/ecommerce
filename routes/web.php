@@ -74,6 +74,7 @@ Route::prefix("admin")->group(function () {
         Route::get('/orders/edit/{id}', [AdminOrderController::class, 'edit'])->name('admin.orders.edit')->can('manage_orders');
         Route::put('/orders/update/{id}', [AdminOrderController::class, 'update'])->name('admin.orders.update')->can('manage_orders');
         Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show')->can('manage_orders');
+        Route::get('/orders/details/{id}', [AdminOrderController::class, 'details'])->name('admin.orders.details')->can('manage_orders');
         Route::put('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.update-status')->can('manage_orders');
         Route::get('/orders/search', [AdminOrderController::class, 'search'])->name('admin.orders.search')->can('manage_orders');
         Route::post('/orders/update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus')->can('manage_orders');
