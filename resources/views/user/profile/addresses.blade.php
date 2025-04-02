@@ -17,7 +17,7 @@
 
                     <hr class="my-4">
 
-                    <nav class="space-y-2">
+                    {{-- <nav class="space-y-2">
                         <a href="{{ route('profile.dashboard') }}"
                             class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
                             <i class="fa-solid fa-tachometer-alt w-5 h-5"></i>
@@ -27,11 +27,6 @@
                             class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
                             <i class="fa-solid fa-shopping-bag w-5 h-5"></i>
                             <span>My Orders</span>
-                        </a>
-                        <a href="#"
-                            class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
-                            <i class="fa-solid fa-user-edit w-5 h-5"></i>
-                            <span>Account Details</span>
                         </a>
                         <a href="{{ route('profile.addresses') }}"
                             class="flex items-center space-x-2 p-2 rounded-lg bg-blue-50 text-blue-700">
@@ -46,7 +41,8 @@
                                 <span>Logout</span>
                             </button>
                         </form>
-                    </nav>
+                    </nav> --}}
+                    <x-users.profile-navbar />
                 </div>
             </div>
 

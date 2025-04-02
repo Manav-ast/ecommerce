@@ -7,22 +7,22 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     // Check if success message exists and display it
-    if (typeof successMessage !== 'undefined') {
+    if (typeof successMessage !== 'undefined' && successMessage && successMessage.trim() !== '') {
         showSuccessToast(successMessage);
     }
 
     // Check if error message exists and display it
-    if (typeof errorMessage !== 'undefined') {
+    if (typeof errorMessage !== 'undefined' && errorMessage && errorMessage.trim() !== '') {
         showErrorToast(errorMessage);
     }
 
     // Check if warning message exists and display it
-    if (typeof warningMessage !== 'undefined') {
+    if (typeof warningMessage !== 'undefined' && warningMessage && warningMessage.trim() !== '') {
         showWarningToast(warningMessage);
     }
 
     // Check if info message exists and display it
-    if (typeof infoMessage !== 'undefined') {
+    if (typeof infoMessage !== 'undefined' && infoMessage && infoMessage.trim() !== '') {
         showInfoToast(infoMessage);
     }
 });

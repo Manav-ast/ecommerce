@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Log;
 
 class AdminLoginController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         try {
             return view("auth.admin.login");
         } catch (\Exception $e) {
@@ -19,27 +20,28 @@ class AdminLoginController extends Controller
         }
     }
 
-    public function authenticate(Request $request) {
+    public function authenticate(Request $request)
+    {
         try {
             $credentials = $request->only(["email", "password"]);
-            
-            if(Auth::guard("admin")->attempt($credentials)) {
+
+            if (Auth::guard("admin")->attempt($credentials)) {
                 $request->session()->regenerate();
                 return redirect(route("admin.dashboard"));
             }
 
             return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => 'Invalid login credentials. The email or password you entered is incorrect.'
             ])->onlyInput('email');
-
         } catch (Exception $e) {
             Log::error("Error authenticating admin: " . $e->getMessage());
             return back()->with('error', 'Something went wrong while logging in.');
         }
     }
 
-   
-    public function logout() {
+
+    public function logout()
+    {
         try {
             Auth::guard("admin")->logout();
             return redirect(route("admin.login"));

@@ -102,7 +102,8 @@ class UserProfileController extends Controller
     public function addresses()
     {
         $user = Auth::user();
-        return view('user.profile.addresses', compact('user'));
+        $addresses = Address::where('user_id', $user->id)->where('is_default', 1)->latest(1);
+        return view('user.profile.addresses', compact('user', 'addresses'));
     }
 
     /**

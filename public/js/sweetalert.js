@@ -67,27 +67,27 @@ function showInfoToast(message) {
  */
 function displayFlashMessages() {
     // Check for success message
-    if (typeof successMessage !== 'undefined' && successMessage) {
+    if (typeof successMessage !== 'undefined' && successMessage && successMessage.trim() !== '') {
         showSuccessToast(successMessage);
     }
-    
+
     // Check for error message
-    if (typeof errorMessage !== 'undefined' && errorMessage) {
+    if (typeof errorMessage !== 'undefined' && errorMessage && errorMessage.trim() !== '') {
         showErrorToast(errorMessage);
     }
-    
+
     // Check for warning message
-    if (typeof warningMessage !== 'undefined' && warningMessage) {
+    if (typeof warningMessage !== 'undefined' && warningMessage && warningMessage.trim() !== '') {
         showWarningToast(warningMessage);
     }
-    
+
     // Check for info message
-    if (typeof infoMessage !== 'undefined' && infoMessage) {
+    if (typeof infoMessage !== 'undefined' && infoMessage && infoMessage.trim() !== '') {
         showInfoToast(infoMessage);
     }
 }
 
 // Initialize flash messages when document is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     displayFlashMessages();
 });

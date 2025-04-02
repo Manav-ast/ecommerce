@@ -113,10 +113,10 @@
                             <p>{{ $billingAddress->city }}, {{ $billingAddress->state }}
                                 {{ $billingAddress->postal_code }}</p>
                             <p>{{ $billingAddress->country }}</p>
-                            @if ($billingAddress->is_default)
+                            {{-- @if ($billingAddress->is_default)
                                 <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs">Default
                                     Address</span>
-                            @endif
+                            @endif --}}
                         </div>
                     @else
                         <p class="text-gray-500">No billing address information available.</p>

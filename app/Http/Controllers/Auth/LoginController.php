@@ -49,7 +49,7 @@ class LoginController extends Controller
             }
 
             return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => 'Invalid login credentials. The email or password you entered is incorrect.'
             ])->onlyInput('email');
         } catch (Exception $e) {
             Log::error("Error during authentication: " . $e->getMessage());
