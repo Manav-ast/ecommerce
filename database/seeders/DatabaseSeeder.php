@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Run role and permission seeder first
+        $this->call([
+            RoleAndPermissionSeeder::class,
+        ]);
+
         User::create([
             "name" =>  "Manav",
             "email" =>  "manav@gmail.com",
@@ -26,15 +31,15 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Roles::create([
-            "role_name" =>  "Admin",
-            "description" =>  "Admin Role",
+            "name" =>  "Admin",
+            // "description" =>  "Admin Role",
         ]);
 
         Admin::create([
             "name" =>  "Admin",
             "email" =>  "admin@gmail.com",
             "password"  =>  Hash::make("Admin@1234"),
-            "role_id" => 1,
+            "role_id" => 1, // This will be the super admin role
         ]);
 
         // $this->call([

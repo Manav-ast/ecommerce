@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->enum("is_super_admin", ["yes", "no"]);
-            $table->timestamps();
+        Schema::table('admins', function (Blueprint $table) {
+            $table->string('phone_number')->nullable()->after('email');
+            $table->enum('status', ['active', 'inactive'])->default('active')->after('role_id');
         });
     }
 
@@ -24,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::table('admins', function (Blueprint $table) {
+            $table->dropColumn(['phone_number', 'status']);
+        });
     }
 };

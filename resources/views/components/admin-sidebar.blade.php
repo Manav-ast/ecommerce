@@ -19,62 +19,93 @@
                     </a>
                 </li>
                 <hr class="my-2">
-                <li>
-                    <a href="{{ route('admin.categories') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                @can('manage_categories')
+                    <li>
+                        <a href="{{ route('admin.categories') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
                         {{ request()->routeIs('admin.categories') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-folder text-lg"></i>
-                        <span class="ml-4">Category</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.products') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                            <i class="uil uil-folder text-lg"></i>
+                            <span class="ml-4">Category</span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage_products')
+                    <li>
+                        <a href="{{ route('admin.products') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
                         {{ request()->routeIs('admin.products') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-shopping-cart text-lg"></i>
-                        <span class="ml-4">Products</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.orders') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                            <i class="uil uil-shopping-cart text-lg"></i>
+                            <span class="ml-4">Products</span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage_orders')
+                    <li>
+                        <a href="{{ route('admin.orders') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
                         {{ request()->routeIs('admin.orders') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-box text-lg"></i>
-                        <span class="ml-4">Orders</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.users') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                            <i class="uil uil-box text-lg"></i>
+                            <span class="ml-4">Orders</span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage_users')
+                    <li>
+                        <a href="{{ route('admin.users') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
                         {{ request()->routeIs('admin.users') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-users-alt text-lg"></i>
-                        <span class="ml-4">Users</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.roles.index') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
-                        {{ request()->routeIs('admin.roles.index') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-user-circle text-lg"></i>
-                        <span class="ml-4">Roles</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.static_blocks.index') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
-                        {{ request()->routeIs('admin.static_blocks.index') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-file-alt text-lg"></i>
-                        <span class="ml-4">Static Blocks</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.page_blocks.index') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
-                        {{ request()->routeIs('admin.page_blocks.index') ? 'bg-blue-500 text-white' : '' }}">
-                        <i class="uil uil-file-alt text-lg"></i>
-                        <span class="ml-4">Page Blocks</span>
-                    </a>
-                </li>
+                            <i class="uil uil-users-alt text-lg"></i>
+                            <span class="ml-4">Users</span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage_admins')
+                    <li>
+                        <a href="{{ route('admin.admins.index') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                        {{ request()->routeIs('admin.admins.index') ? 'bg-blue-500 text-white' : '' }}">
+                            <i class="uil uil-users-alt text-lg"></i>
+                            <span class="ml-4">Admins</span>
+                        </a>
+                    </li>
+                @endcan
+                
+                @can('manage_roles')
+                    <li>
+                        <a href="{{ route('admin.roles') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                        {{ request()->routeIs('admin.roles') ? 'bg-blue-500 text-white' : '' }}">
+                            <i class="uil uil-user-circle text-lg"></i>
+                            <span class="ml-4">Roles</span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage_static_blocks')
+                    <li>
+                        <a href="{{ route('admin.static-blocks.index') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                        {{ request()->routeIs('admin.static-blocks') ? 'bg-blue-500 text-white' : '' }}">
+                            <i class="uil uil-file-alt text-lg"></i>
+                            <span class="ml-4">Static Blocks</span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage_page_blocks')
+                    <li>
+                        <a href="{{ route('admin.page-blocks.index') }}"
+                            class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-white transition 
+                        {{ request()->routeIs('admin.page-blocks.index') ? 'bg-blue-500 text-white' : '' }}">
+                            <i class="uil uil-file-alt text-lg"></i>
+                            <span class="ml-4">Page Blocks</span>
+                        </a>
+                    </li>
+                @endcan
             </ul>
         </nav>
     </div>

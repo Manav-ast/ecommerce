@@ -3,7 +3,7 @@
         <div class="flex justify-between items-start mb-3">
             <h3 class="text-lg font-semibold text-gray-800">{{ $block->title }}</h3>
             <div class="flex space-x-3">
-                <a href="{{ route('admin.page_blocks.edit', $block->id) }}"
+                <a href="{{ route('admin.page-blocks.edit', $block->id) }}"
                     class="text-blue-500 hover:text-blue-700 transition">
                     <i class="uil uil-edit"></i>
                 </a>

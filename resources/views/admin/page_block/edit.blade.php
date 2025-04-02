@@ -7,7 +7,7 @@
             <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Edit Page Block</h2>
 
             <!-- Form -->
-            <form id="editPageBlockForm" action="{{ route('admin.page_blocks.update', $pageBlock->id) }}" method="POST">
+            <form id="editPageBlockForm" action="{{ route('admin.page-blocks.update', $pageBlock->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 

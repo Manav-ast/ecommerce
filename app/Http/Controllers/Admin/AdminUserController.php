@@ -9,9 +9,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Admin\UserRequest;
+use Illuminate\Support\Facades\Gate;
 
 class AdminUserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:manage_users');
+    }
+
     // Display all users
     public function index()
     {

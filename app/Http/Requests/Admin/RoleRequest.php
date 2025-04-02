@@ -22,17 +22,8 @@ class RoleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('role'); // Get the role ID from the route parameter if it exists
-
-        return [
-            'role_name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('roles', 'role_name')->ignore($roleId)
-            ],
-            'description' => 'nullable|string|max:255'
-        ];
+        // This class is no longer used as validation is handled directly in the controller
+        return [];
     }
 
     /**
@@ -42,13 +33,6 @@ class RoleRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'role_name.required' => 'The role name is required.',
-            'role_name.string' => 'The role name must be a string.',
-            'role_name.max' => 'The role name cannot exceed 100 characters.',
-            'role_name.unique' => 'This role name is already taken.',
-            'description.string' => 'The description must be a string.',
-            'description.max' => 'The description cannot exceed 255 characters.'
-        ];
+        return [];
     }
 }

@@ -21,8 +21,8 @@
                 <thead class="bg-gray-100 border-b border-gray-200">
                     <tr>
                         <th class="px-6 py-3 text-left text-gray-600">ID</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Role Name</th>
-                        <th class="px-6 py-3 text-left text-gray-600">Description</th>
+                        <th class="px-6 py-3 text-left text-gray-600">Name</th>
+                        <th class="px-6 py-3 text-left text-gray-600">Super Admin</th>
                         <th class="px-6 py-3 text-left text-gray-600">Actions</th>
                     </tr>
                 </thead>
@@ -30,8 +30,8 @@
                     @foreach ($roles as $role)
                         <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
                             <td class="px-6 py-3 text-gray-800">{{ $role->id }}</td>
-                            <td class="px-6 py-3 text-gray-800">{{ $role->role_name }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $role->description ?? 'No description' }}</td>
+                            <td class="px-6 py-3 text-gray-800">{{ $role->name }}</td>
+                            <td class="px-6 py-3 text-gray-600">{{ $role->is_super_admin === 'yes' ? 'Yes' : 'No' }}</td>
                             <td class="px-6 py-3 flex space-x-4">
                                 <!-- Edit Button -->
                                 <a href="{{ route('admin.roles.edit', $role->id) }}"
@@ -58,8 +58,9 @@
                 <div class="bg-white rounded-lg shadow-md p-4">
                     <div class="flex justify-between items-start mb-3">
                         <div>
-                            <h3 class="font-semibold text-gray-800">#{{ $role->id }} - {{ $role->role_name }}</h3>
-                            <p class="text-sm text-gray-600 mt-1">{{ $role->description ?? 'No description' }}</p>
+                            <h3 class="font-semibold text-gray-800">#{{ $role->id }} - {{ $role->name }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">Super Admin:
+                                {{ $role->is_super_admin === 'yes' ? 'Yes' : 'No' }}</p>
                         </div>
                         <div class="flex space-x-3">
                             <a href="{{ route('admin.roles.edit', $role->id) }}"

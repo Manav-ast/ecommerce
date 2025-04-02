@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Roles;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\RoleRequest;
+use App\Models\Permission;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class AdminRoleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:manage_roles');
+    }
+
     // Display all roles
     public function index()
     {
@@ -25,43 +35,53 @@ class AdminRoleController extends Controller
     // Show create role form
     public function create()
     {
-        return view('admin.roles.create');
+        $permissions = Permission::all();
+        return view('admin.roles.create', compact('permissions'));
     }
 
     // Store new role
-    public function store(RoleRequest $request)
+    public function store(Request $request)
     {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('roles', 'name')->whereNull('deleted_at')
+            ],
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,id'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
         try {
-            Roles::create($request->validated());
+            // Start a database transaction
+            DB::beginTransaction();
 
-            // **Check if request is AJAX**
-            if ($request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Role created successfully!']);
+            // Create the role
+            $role = Roles::create([
+                'name' => $request->name,
+                'is_super_admin' => $request->is_super_admin ? Roles::STATUS_YES : Roles::STATUS_NO,
+            ]);
+
+            // Sync permissions if they are provided
+            if (!empty($request->permissions)) {
+                $role->permissions()->sync($request->permissions);
             }
 
-            return redirect()->route('admin.roles.index')->with('success', 'Role created successfully!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // **Return JSON validation errors**
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed!',
-                    'errors' => $e->errors()
-                ], 422);
-            }
+            // Commit the transaction
+            DB::commit();
 
-            return back()->withErrors($e->errors())->withInput();
+            return redirect()->route('admin.roles')->with('success', 'Role created successfully!');
         } catch (\Exception $e) {
+            // Rollback the transaction
+            DB::rollBack();
             Log::error("Error creating role: " . $e->getMessage());
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Something went wrong: ' . $e->getMessage()
-                ], 500);
-            }
-
-            return back()->with('error', 'Something went wrong while creating the role.');
+            return back()->with('error', 'Something went wrong while creating the role: ' . $e->getMessage());
         }
     }
 
@@ -70,24 +90,60 @@ class AdminRoleController extends Controller
     {
         try {
             $role = Roles::findOrFail($id);
-            return view('admin.roles.edit', compact('role'));
+            $permissions = Permission::all();
+            $rolePermissions = $role->permissions->pluck('id')->toArray();
+            return view('admin.roles.edit', compact('role', 'permissions', 'rolePermissions'));
         } catch (\Exception $e) {
-            Log::error("Error fetching role for edit: " . $e->getMessage());
+            Log::error("Error fetching role: " . $e->getMessage());
             return back()->with('error', 'Role not found.');
         }
     }
 
     // Update role details
-    public function update(RoleRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        try {
-            $role = Roles::findOrFail($id);
-            $role->update($request->validated());
+        // Validate the request - no uniqueness check on name for updates
+        $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,id'
+        ]);
 
-            return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully!');
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            // Start a database transaction
+            DB::beginTransaction();
+
+            $role = Roles::findOrFail($id);
+            $role->update([
+                'name' => $request->name,
+                'is_super_admin' => $request->is_super_admin ? Roles::STATUS_YES : Roles::STATUS_NO,
+            ]);
+
+            // Sync permissions if they are provided
+            if (!empty($request->permissions)) {
+                $role->permissions()->sync($request->permissions);
+            } else {
+                // If no permissions are selected, detach all permissions
+                $role->permissions()->detach();
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->route('admin.roles')->with('success', 'Role updated successfully!');
         } catch (\Exception $e) {
+            // Rollback the transaction
+            DB::rollBack();
             Log::error("Error updating role: " . $e->getMessage());
-            return back()->with('error', 'Something went wrong while updating the role.');
+            return back()->with('error', 'Something went wrong while updating the role: ' . $e->getMessage());
         }
     }
 
@@ -104,7 +160,7 @@ class AdminRoleController extends Controller
 
             $role->delete();
 
-            return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully!');
+            return redirect()->route('admin.roles')->with('success', 'Role deleted successfully!');
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error("Database error while deleting role: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'This role is linked to other records and cannot be deleted.'], 500);
@@ -123,7 +179,7 @@ class AdminRoleController extends Controller
             if ($request->ajax()) {
                 $query = $request->q;
 
-                $roles = Roles::where('role_name', 'LIKE', "%{$query}%")
+                $roles = Roles::where('name', 'LIKE', "%{$query}%")
                     ->orWhere('description', 'LIKE', "%{$query}%")
                     ->get();
 
@@ -134,13 +190,13 @@ class AdminRoleController extends Controller
                         $output .= '
                         <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
                             <td class="px-6 py-3 text-gray-800">' . e($role->id) . '</td>
-                            <td class="px-6 py-3 text-gray-800">' . e($role->role_name) . '</td>
+                            <td class="px-6 py-3 text-gray-800">' . e($role->name) . '</td>
                             <td class="px-6 py-3 text-gray-600">' . e($role->description ?? 'No description') . '</td>
                             <td class="px-6 py-3 flex space-x-4">
                                 <a href="' . route('admin.roles.edit', $role->id) . '" class="text-blue-500 hover:text-blue-700 transition">
                                     <i class="uil uil-edit"></i>
                                 </a>
-                                <button type="button" onclick="openDeleteModal(' . $role->id . ', \'' . e($role->role_name) . '\')"
+                                <button type="button" onclick="openDeleteModal(' . $role->id . ', \'' . e($role->name) . '\')"
                                     class="text-red-500 hover:text-red-700 transition">
                                     <i class="uil uil-trash-alt"></i>
                                 </button>
@@ -159,14 +215,14 @@ class AdminRoleController extends Controller
                         <div class="bg-white rounded-lg shadow-md p-4">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">#' . e($role->id) . ' - ' . e($role->role_name) . '</h3>
+                                    <h3 class="font-semibold text-gray-800">#' . e($role->id) . ' - ' . e($role->name) . '</h3>
                                     <p class="text-sm text-gray-600 mt-1">' . e($role->description ?? 'No description') . '</p>
                                 </div>
                                 <div class="flex space-x-3">
                                     <a href="' . route('admin.roles.edit', $role->id) . '" class="text-blue-500 hover:text-blue-700 transition">
                                         <i class="uil uil-edit"></i>
                                     </a>
-                                    <button type="button" onclick="openDeleteModal(' . $role->id . ', \'' . e($role->role_name) . '\')"
+                                    <button type="button" onclick="openDeleteModal(' . $role->id . ', \'' . e($role->name) . '\')"
                                         class="text-red-500 hover:text-red-700 transition">
                                         <i class="uil uil-trash-alt"></i>
                                     </button>

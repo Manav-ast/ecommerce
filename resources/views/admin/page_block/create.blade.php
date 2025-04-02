@@ -88,13 +88,13 @@
                 formData.set('content', $('#content').summernote('code'));
 
                 $.ajax({
-                    url: '{{ route('admin.page_blocks.store') }}',
+                    url: '{{ route('admin.page-blocks.store') }}',
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        window.location.href = '{{ route('admin.page_blocks.index') }}';
+                        window.location.href = '{{ route('admin.page-blocks.index') }}';
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
@@ -156,7 +156,7 @@
                     formData.set('content', $('#content').summernote('code'));
 
                     $.ajax({
-                        url: "{{ route('admin.page_blocks.store') }}",
+                        url: "{{ route('admin.page-blocks.store') }}",
                         type: "POST",
                         data: formData,
                         processData: false,
@@ -170,7 +170,7 @@
                                     'Page block created successfully!');
                                 setTimeout(() => {
                                     window.location.href =
-                                        "{{ route('admin.page_blocks.index') }}";
+                                        "{{ route('admin.page-blocks.index') }}";
                                 }, 1000);
                             } else {
                                 showErrorToast(response.message ||

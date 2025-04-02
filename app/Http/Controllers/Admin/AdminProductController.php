@@ -9,9 +9,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\ProductRequest;
+use Illuminate\Support\Facades\Gate;
 
 class AdminProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:manage_products');
+    }
+
     // Display all products
     public function index()
     {

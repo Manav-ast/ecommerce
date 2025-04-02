@@ -43,7 +43,7 @@ class AdminPageBlockController extends Controller
         try {
             PageBlock::create($request->validated());
 
-            return redirect()->route('admin.page_blocks.index')
+            return redirect()->route('admin.page-blocks.index')
                 ->with('success', 'Page block created successfully.');
         } catch (\Exception $e) {
             Log::error('Page Block Creation Error: ' . $e->getMessage());
@@ -78,7 +78,7 @@ class AdminPageBlockController extends Controller
             $pageBlock = PageBlock::findOrFail($id);
             $pageBlock->update($request->validated());
 
-            return redirect()->route('admin.page_blocks.index')
+            return redirect()->route('admin.page-blocks.index')
                 ->with('success', 'Page block updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()

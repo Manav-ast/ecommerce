@@ -8,7 +8,7 @@
             </span>
         </td>
         <td class="px-6 py-3 flex space-x-4">
-            <a href="{{ route('admin.static_blocks.edit', $block->id) }}"
+            <a href="{{ route('admin.static-blocks.edit', $block->id) }}"
                 class="text-blue-500 hover:text-blue-700 transition">
                 <i class="uil uil-edit"></i>
             </a>

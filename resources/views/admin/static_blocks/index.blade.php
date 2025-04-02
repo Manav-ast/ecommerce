@@ -9,7 +9,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-md">
             <input type="text" id="searchInput" placeholder="Search Static Blocks"
                 class="border p-2 rounded-md w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <a href="{{ route('admin.static_blocks.create') }}"
+            <a href="{{ route('admin.static-blocks.create') }}"
                 class="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition text-center">
                 <i class="uil uil-plus"></i> Static Block
             </a>
@@ -38,7 +38,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-3 flex space-x-4">
-                                <a href="{{ route('admin.static_blocks.edit', $block->id) }}"
+                                <a href="{{ route('admin.static-blocks.edit', $block->id) }}"
                                     class="text-blue-500 hover:text-blue-700 transition">
                                     <i class="uil uil-edit"></i>
                                 </a>
@@ -66,7 +66,7 @@
                     </div>
                     <p class="text-gray-600 text-sm mb-4">{{ $block->slug }}</p>
                     <div class="flex justify-end space-x-4">
-                        <a href="{{ route('admin.static_blocks.edit', $block->id) }}"
+                        <a href="{{ route('admin.static-blocks.edit', $block->id) }}"
                             class="text-blue-500 hover:text-blue-700 transition">
                             <i class="uil uil-edit"></i>
                         </a>
@@ -99,7 +99,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('admin.static_blocks.destroy', $block->id) }}",
+                        url: "{{ route('admin.static-blocks.destroy', $block->id) }}",
                         type: "DELETE",
                         data: {
                             _token: "{{ csrf_token() }}"
@@ -132,7 +132,7 @@
             searchTimer = setTimeout(() => {
                 let query = this.value;
 
-                fetch("{{ route('admin.static_blocks.search') }}?q=" + encodeURIComponent(query), {
+                fetch("{{ route('admin.static-blocks.search') }}?q=" + encodeURIComponent(query), {
                         method: "GET",
                         headers: {
                             "X-Requested-With": "XMLHttpRequest"

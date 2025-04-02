@@ -9,9 +9,15 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Http\Requests\Admin\CategoryRequest;
+use Illuminate\Support\Facades\Gate;
 
 class AdminCategoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:manage_categories');
+    }
+
     // Display all categories
     public function index()
     {
@@ -54,7 +60,7 @@ class AdminCategoryController extends Controller
         }
     }
 
-    // Show edit form
+    // Show category edit form
     public function edit($id)
     {
         try {
@@ -116,55 +122,24 @@ class AdminCategoryController extends Controller
         }
     }
 
-    // Search categories via AJAX
+    // Search categories
     public function search(Request $request)
     {
         try {
-            if ($request->ajax()) {
-                $query = $request->q; // Make sure this matches the AJAX request
-                Log::info("Search Query: " . $query); // Debugging
+            $search = $request->input('q');
+            $categories = Category::where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->get();
 
-                $categories = Category::where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('slug', 'LIKE', "%{$query}%")
-                    ->get();
-
-                $output = '';
-                if ($categories->isNotEmpty()) {
-                    foreach ($categories as $category) {
-                        $output .= '
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                        <td class="px-6 py-3 relative">
-                            <div class="w-10 h-10 overflow-hidden">
-                                <img src="' . asset('storage/' . $category->image) . '" 
-                                    class="w-10 h-10 object-cover rounded">
-                            </div>
-                        </td>
-                        <td class="px-6 py-3 text-gray-800">' . e($category->name) . '</td>
-                        <td class="px-6 py-3 text-gray-600">' . e($category->slug) . '</td>
-                        <td class="px-6 py-3 text-gray-600">' . Str::limit($category->description, 50) . '</td>
-                        <td class="px-6 py-3 flex space-x-4">
-                            <a href="' . route('admin.categories.edit', $category->id) . '" class="text-blue-500 hover:text-blue-700 transition">
-                                <i class="uil uil-edit"></i>
-                            </a>
-                            <button type="button" onclick="openDeleteModal(' . $category->id . ', \'' . e($category->name) . '\')"
-                                class="text-red-500 hover:text-red-700 transition">
-                                <i class="uil uil-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>';
-                    }
-                } else {
-                    $output = '<tr><td colspan="5" class="text-center py-3 text-gray-600">No categories found</td></tr>';
-                }
-
-                return response()->json(['html' => $output]); // Returns JSON response
-            }
+            $html = view('admin.category.partials.table-body', compact('categories'))->render();
+            return response()->json(['success' => true, 'html' => $html]);
         } catch (\Exception $e) {
             Log::error("Error searching categories: " . $e->getMessage());
-            return response()->json(['error' => 'Something went wrong while searching categories.'], 500);
+            return response()->json(['success' => false, 'message' => 'Something went wrong while searching categories.']);
         }
     }
 
+    // Show trashed categories
     // Get trashed categories
     public function trashed()
     {

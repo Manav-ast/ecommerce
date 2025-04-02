@@ -88,13 +88,13 @@
                 formData.set('content', $('#content').summernote('code'));
 
                 $.ajax({
-                    url: '{{ route('admin.static_blocks.store') }}',
+                    url: '{{ route('admin.static-blocks.store') }}',
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        window.location.href = '{{ route('admin.static_blocks.index') }}';
+                        window.location.href = '{{ route('admin.static-blocks.index') }}';
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
@@ -156,7 +156,7 @@
                     formData.set('content', $('#content').summernote('code'));
 
                     $.ajax({
-                        url: "{{ route('admin.static_blocks.store') }}",
+                        url: "{{ route('admin.static-blocks.store') }}",
                         type: "POST",
                         data: formData,
                         processData: false,
@@ -170,7 +170,7 @@
                                     'Static block created successfully!');
                                 setTimeout(() => {
                                     window.location.href =
-                                        "{{ route('admin.static_blocks.index') }}";
+                                        "{{ route('admin.static-blocks.index') }}";
                                 }, 1000);
                             } else {
                                 showErrorToast(response.message ||

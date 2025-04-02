@@ -9,7 +9,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-md">
             <input type="text" id="searchInput" placeholder="Search Page Blocks"
                 class="border p-2 rounded-md w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <a href="{{ route('admin.page_blocks.create') }}"
+            <a href="{{ route('admin.page-blocks.create') }}"
                 class="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition text-center">
                 <i class="uil uil-plus"></i> Page Block
             </a>
@@ -38,7 +38,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-3 flex space-x-4">
-                                <a href="{{ route('admin.page_blocks.edit', $block->id) }}"
+                                <a href="{{ route('admin.page-blocks.edit', $block->id) }}"
                                     class="text-blue-500 hover:text-blue-700 transition">
                                     <i class="uil uil-edit"></i>
                                 </a>
@@ -60,7 +60,7 @@
                     <div class="flex justify-between items-start mb-3">
                         <h3 class="text-lg font-semibold text-gray-800">{{ $block->title }}</h3>
                         <div class="flex space-x-3">
-                            <a href="{{ route('admin.page_blocks.edit', $block->id) }}"
+                            <a href="{{ route('admin.page-blocks.edit', $block->id) }}"
                                 class="text-blue-500 hover:text-blue-700 transition">
                                 <i class="uil uil-edit"></i>
                             </a>
@@ -139,7 +139,7 @@
             searchTimer = setTimeout(() => {
                 let query = this.value;
 
-                fetch("{{ route('admin.page_blocks.search') }}?q=" + encodeURIComponent(query), {
+                fetch("{{ route('admin.page-blocks.search') }}?q=" + encodeURIComponent(query), {
                         method: "GET",
                         headers: {
                             "X-Requested-With": "XMLHttpRequest"

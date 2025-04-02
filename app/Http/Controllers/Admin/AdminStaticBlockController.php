@@ -78,7 +78,7 @@ class AdminStaticBlockController extends Controller
             $staticBlock = StaticBlock::findOrFail($id);
             $staticBlock->update($request->validated());
 
-            return redirect()->route('admin.static_blocks.index')
+            return redirect()->route('admin.static-blocks.index')
                 ->with('success', 'Static block updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()

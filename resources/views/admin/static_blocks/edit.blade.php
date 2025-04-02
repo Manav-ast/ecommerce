@@ -7,7 +7,7 @@
             <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Edit Static Block</h2>
 
             <!-- Form -->
-            <form id="editStaticBlockForm" action="{{ route('admin.static_blocks.update', $staticBlock->id) }}" method="POST">
+            <form id="editStaticBlockForm" action="{{ route('admin.static-blocks.update', $staticBlock->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 

@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Services\InvoiceService;
 use \Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
 
 class AdminOrderController extends Controller
 {
@@ -15,6 +16,7 @@ class AdminOrderController extends Controller
 
     public function __construct(InvoiceService $invoiceService)
     {
+        $this->middleware('can:manage_orders');
         $this->invoiceService = $invoiceService;
     }
 

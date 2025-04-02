@@ -9,7 +9,7 @@
         </div>
         <p class="text-gray-600 text-sm mb-4">{{ $block->slug }}</p>
         <div class="flex justify-end space-x-4">
-            <a href="{{ route('admin.static_blocks.edit', $block->id) }}"
+            <a href="{{ route('admin.static-blocks.edit', $block->id) }}"
                 class="text-blue-500 hover:text-blue-700 transition">
                 <i class="uil uil-edit"></i>
             </a>
