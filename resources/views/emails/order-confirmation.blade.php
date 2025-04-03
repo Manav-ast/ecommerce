@@ -127,7 +127,7 @@
 
         <p>You can track your order status by visiting your account dashboard:</p>
 
-        <a href="{{ url('/user/orders/' . $order->id) }}" class="button">View Order</a>
+        <a href="{{ url('/profile/orders/' . $order->id . '/details') }}" class="button">View Order</a>
 
         <p>If you have any questions or need assistance with your order, please don't hesitate to contact our customer
             support team.</p>

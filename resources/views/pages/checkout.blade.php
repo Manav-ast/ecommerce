@@ -1,9 +1,10 @@
 @extends('layouts.users.app')
 
 @section('content')
-    <div class="container grid grid-cols-12 items-start gap-6 pb-16 pt-4" role="main">
+    <div class="container grid grid-cols-1 sm:grid-cols-12 gap-6 pb-16 pt-4" role="main">
         <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form"
-            class="col-span-8 border border-gray-200 p-6 rounded bg-white shadow-sm">
+            class="w-full sm:col-span-8 border border-gray-200 p-4 sm:p-6 rounded bg-white shadow-sm">
+
             @csrf
 
             <h3 class="text-xl font-semibold capitalize mb-6">Checkout</h3>
@@ -327,43 +328,46 @@
         </form>
 
         <!-- Order Summary -->
-        <aside class="col-span-4 border border-gray-200 p-6 rounded bg-white shadow-sm sticky top-4">
-            <h4 class="text-gray-800 text-lg mb-4 font-medium uppercase">Order Summary</h4>
+        <div class="w-full sm:col-span-4 border border-gray-200 p-4 sm:p-6 rounded bg-white shadow-sm">
+            <aside class="col-span-4 border border-gray-200 p-6 rounded bg-white shadow-sm sticky top-4">
+                <h4 class="text-gray-800 text-lg mb-4 font-medium uppercase">Order Summary</h4>
 
-            <div class="space-y-4">
-                @foreach ($cart as $id => $item)
-                    <div class="flex justify-between border-b border-gray-200 pb-2">
-                        <div>
-                            <h5 class="text-gray-800 font-medium">{{ $item['name'] }}</h5>
+                <div class="space-y-4">
+                    @foreach ($cart as $id => $item)
+                        <div class="flex justify-between border-b border-gray-200 pb-2">
+                            <div>
+                                <h5 class="text-gray-800 font-medium">{{ $item['name'] }}</h5>
+                            </div>
+                            <p class="text-gray-600">X {{ $item['quantity'] }}</p>
+                            <p class="text-gray-800 font-medium">
+                                ${{ number_format($item['price'] * $item['quantity'], 2) }}
+                            </p>
                         </div>
-                        <p class="text-gray-600">X {{ $item['quantity'] }}</p>
-                        <p class="text-gray-800 font-medium">${{ number_format($item['price'] * $item['quantity'], 2) }}
-                        </p>
+                    @endforeach
+                </div>
+
+                <div class="space-y-3 mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex justify-between text-gray-700">
+                        <p>Subtotal</p>
+                        <p>${{ number_format($cartTotal, 2) }}</p>
                     </div>
-                @endforeach
-            </div>
+                    <div class="flex justify-between text-gray-700">
+                        <p>Shipping</p>
+                        <p class="text-green-600">Free</p>
+                    </div>
+                    <div class="flex justify-between text-gray-800 font-semibold text-lg pt-2 border-t border-gray-200">
+                        <p>Total</p>
+                        <p>${{ number_format($cartTotal, 2) }}</p>
+                    </div>
+                </div>
 
-            <div class="space-y-3 mt-4 pt-4 border-t border-gray-200">
-                <div class="flex justify-between text-gray-700">
-                    <p>Subtotal</p>
-                    <p>${{ number_format($cartTotal, 2) }}</p>
-                </div>
-                <div class="flex justify-between text-gray-700">
-                    <p>Shipping</p>
-                    <p class="text-green-600">Free</p>
-                </div>
-                <div class="flex justify-between text-gray-800 font-semibold text-lg pt-2 border-t border-gray-200">
-                    <p>Total</p>
-                    <p>${{ number_format($cartTotal, 2) }}</p>
-                </div>
-            </div>
-
-            <button type="submit" form="checkout-form"
-                class="block w-full py-3 px-4 mt-4 text-center text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                aria-label="Place your order">
-                Place Order
-            </button>
-        </aside>
+                <button type="submit" form="checkout-form"
+                    class="block w-full py-3 px-4 mt-4 text-center text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    aria-label="Place your order">
+                    Place Order
+                </button>
+            </aside>
+        </div>
     </div>
 @endsection
 

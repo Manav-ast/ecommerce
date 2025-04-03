@@ -3,7 +3,7 @@
 @section('content')
     <div class="container mx-auto px-4 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <!-- Product Image Gallery -->
+            <!-- Product Image -->
             <div class="relative">
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
                     class="w-full h-[450px] object-cover rounded-lg shadow-lg transition-transform hover:scale-105">
@@ -49,24 +49,22 @@
                 <div class="mt-6 flex items-center gap-4">
                     <label for="quantity" class="text-lg font-medium text-gray-700">Quantity:</label>
                     <div class="flex items-center border border-gray-300 rounded-full">
-                        <button type="button" onclick="decreaseQuantity()"
+                        <button type="button" id="decrease-quantity"
                             class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-l-full">-</button>
                         <input type="number" id="quantity" value="1" min="1"
                             max="{{ $product->stock_quantity }}"
                             class="w-16 text-center text-lg font-medium border-none focus:ring-0">
-                        <button type="button" onclick="increaseQuantity()"
+                        <button type="button" id="increase-quantity"
                             class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-r-full">+</button>
                     </div>
                 </div>
 
-                <!-- Add to Cart & Wishlist -->
+                <!-- Add to Cart -->
                 <div class="mt-6 flex gap-4">
-                    <button
-                        class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow hover:bg-blue-700 transition"
-                        onclick="addToCart({{ $product->id }})">
+                    <button id="add-to-cart"
+                        class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow hover:bg-blue-700 transition">
                         <i class="fa-solid fa-bag-shopping"></i> Add to Cart
                     </button>
-
                 </div>
             </div>
         </div>
@@ -82,114 +80,68 @@
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- JavaScript with jQuery -->
     <script>
-        function decreaseQuantity() {
-            let quantityInput = document.getElementById("quantity");
-            let quantity = parseInt(quantityInput.value);
-            if (quantity > 1) {
-                quantityInput.value = quantity - 1;
-            }
-        }
+        $(document).ready(function() {
+            // Increase quantity
+            $("#increase-quantity").click(function() {
+                let quantityInput = $("#quantity");
+                let quantity = parseInt(quantityInput.val());
+                let maxStock = {{ $product->stock_quantity }};
+                if (quantity < maxStock) {
+                    quantityInput.val(quantity + 1);
+                }
+            });
 
-        function increaseQuantity() {
-            let quantityInput = document.getElementById("quantity");
-            let quantity = parseInt(quantityInput.value);
-            let maxStock = {{ $product->stock_quantity }};
-            if (quantity < maxStock) {
-                quantityInput.value = quantity + 1;
-            }
-        }
+            // Decrease quantity
+            $("#decrease-quantity").click(function() {
+                let quantityInput = $("#quantity");
+                let quantity = parseInt(quantityInput.val());
+                if (quantity > 1) {
+                    quantityInput.val(quantity - 1);
+                }
+            });
 
-        function addToCart(productId) {
-            let quantity = document.getElementById("quantity") ? document.getElementById("quantity").value : 1;
+            // Add to Cart
+            $("#add-to-cart").click(function() {
+                let productId = {{ $product->id }};
+                let quantity = $("#quantity").val();
 
-            fetch("{{ url('/cart/add') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
+                $.post("{{ url('/cart/add') }}", {
+                    _token: "{{ csrf_token() }}",
+                    product_id: productId,
+                    quantity: quantity
+                }, function(data) {
                     if (data.success) {
-                        // Update the cart count dynamically
-                        let cartCountElement = document.getElementById("cart-count");
-                        cartCountElement.innerText = data.cart_count;
+                        // Update cart count dynamically
+                        $("#cart-count").text(data.cart_count);
 
                         // Ensure cart count is visible
                         if (data.cart_count > 0) {
-                            cartCountElement.classList.remove("hidden");
+                            $("#cart-count").removeClass("hidden");
                         }
 
-                        // Show success toast notification
-                        showSuccessToast('Product added to cart successfully!');
-                    }
-                })
-                .catch(error => console.error("Error:", error));
-        }
-
-        function updateCart(productId, action) {
-            fetch("{{ url('/cart/update') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        action: action
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("cart-items").innerHTML = data.cartHtml;
-                        document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
-
-                        let cartCountElement = document.getElementById("cart-count");
-                        cartCountElement.innerText = data.cartCount;
-
-                        if (data.cartCount == 0) {
-                            cartCountElement.classList.add("hidden");
-                        } else {
-                            cartCountElement.classList.remove("hidden");
-                        }
+                        // Show success message
+                        showSuccessToast("Product added to cart successfully!");
                     }
                 });
-        }
+            });
+        });
 
-        function removeFromCart(productId) {
-            fetch("{{ url('/cart/remove') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        product_id: productId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("cart-items").innerHTML = data.cartHtml;
-                        document.getElementById("cart-total").innerText = `$${data.cartTotal}`;
-
-                        let cartCountElement = document.getElementById("cart-count");
-                        cartCountElement.innerText = data.cartCount;
-
-                        if (data.cartCount == 0) {
-                            cartCountElement.classList.add("hidden");
-                        } else {
-                            cartCountElement.classList.remove("hidden");
-                        }
-                    }
+        function showSuccessToast(message) {
+            $("body").append(`
+                <div class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-3 rounded-lg shadow-md">
+                    ${message}
+                </div>
+            `);
+            setTimeout(function() {
+                $(".fixed.bottom-4.right-4").fadeOut(500, function() {
+                    $(this).remove();
                 });
+            }, 3000);
         }
     </script>
 @endsection

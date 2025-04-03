@@ -3,9 +3,9 @@
 @section('content')
     <div class="container mx-auto px-4 py-12">
         <div class="w-full max-w-4xl mx-auto py-10">
-            <div class="flex flex-col lg:flex-row items-start gap-6">
+            <div class="flex flex-col lg:flex-row flex-wrap items-start gap-6">
                 <!-- Left Section: Cart Items -->
-                <div class="lg:w-2/3 flex-1">
+                <div class="lg:w-2/3 w-full">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center lg:text-left">Your Cart</h2>
                     <div id="cart-items" class="space-y-4">
                         @forelse ($cart as $key => $cartItem)
@@ -18,13 +18,12 @@
                 </div>
 
                 <!-- Right Section: Cart Summary -->
-                <div class="lg:w-1/3 flex-shrink-0">
+                <div class="lg:w-1/3 w-full">
                     <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm sticky top-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Cart Summary</h3>
                         <div class="flex justify-between items-center mb-6">
                             <p class="text-sm font-medium text-gray-700">Total:</p>
-                            <p id="cart-total" class="text-xl font-bold text-blue-500">${{ number_format($cartTotal, 2) }}
-                            </p>
+                            <p id="cart-total" class="text-xl font-bold text-blue-500">${{ number_format($cartTotal, 2) }}</p>
                         </div>
                         <div class="space-y-3">
                             <a href="{{ route('checkout.index') }}"
@@ -42,8 +41,11 @@
         </div>
     </div>
 
-    <!-- Include Delete Confirmation Modal -->
     @include('user.cart.partials.delete-confirmation-modal')
+@endsection
+@push('scripts')
+    
+
 
     <!-- JavaScript for Updating Cart -->
     <script>
@@ -134,4 +136,4 @@
                 });
         }
     </script>
-@endsection
+@endpush

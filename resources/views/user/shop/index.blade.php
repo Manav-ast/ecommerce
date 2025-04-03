@@ -1,4 +1,5 @@
 @extends('layouts.users.app')
+
 @section('content')
     <div class="container mx-auto px-4 py-8">
         <!-- Mobile Filter Toggle Button -->
@@ -17,16 +18,13 @@
                 <div class="space-y-3">
                     @foreach ($categories as $category)
                         <div class="flex items-center group">
-                            <input type="checkbox" id="{{ $category->slug }}"
-                                class="category-checkbox text-primary focus:ring-2 focus:ring-primary/20 rounded-sm cursor-pointer transition-colors"
+                            <input type="checkbox" id="{{ $category->slug }}" class="category-checkbox text-primary focus:ring-2 focus:ring-primary/20 rounded-sm cursor-pointer transition-colors"
                                 value="{{ $category->id }}" data-slug="{{ $category->slug }}">
-                            <label for="{{ $category->slug }}"
-                                class="text-gray-600 ml-3 cursor-pointer group-hover:text-gray-800 transition-colors flex-1">
+                            <label for="{{ $category->slug }}" class="text-gray-600 ml-3 cursor-pointer group-hover:text-gray-800 transition-colors flex-1">
                                 {{ $category->name }}
                             </label>
                         </div>
                     @endforeach
-
                 </div>
 
                 <!-- Price Filter -->
@@ -62,91 +60,72 @@
                 </div>
             </section>
         </div>
+
         <div class="mt-8 px-4">
             {{ $products->links() }}
         </div>
     </div>
 
-    <!-- JavaScript for Filtering -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- JavaScript for Filtering (Using jQuery) -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        $(document).ready(function () {
             // Mobile filter toggle functionality
-            const mobileFilterToggle = document.getElementById("mobile-filter-toggle");
-            const filterSidebar = document.getElementById("filter-sidebar");
+            $("#mobile-filter-toggle").click(function () {
+                $("#filter-sidebar").toggleClass("hidden");
+                let btnText = $("#filter-sidebar").hasClass("hidden") ? '<i class="fa-solid fa-filter"></i> Show Filters' : '<i class="fa-solid fa-times"></i> Hide Filters';
+                $(this).html(btnText);
+            });
 
-            if (mobileFilterToggle && filterSidebar) {
-                mobileFilterToggle.addEventListener("click", function() {
-                    filterSidebar.classList.toggle("hidden");
-
-                    // Update button text based on visibility
-                    if (filterSidebar.classList.contains("hidden")) {
-                        mobileFilterToggle.innerHTML = '<i class="fa-solid fa-filter"></i> Show Filters';
-                    } else {
-                        mobileFilterToggle.innerHTML = '<i class="fa-solid fa-times"></i> Hide Filters';
-                    }
-                });
-            }
-
-            // Close filters when window is resized to desktop view
-            window.addEventListener("resize", function() {
-                if (window.innerWidth >= 768) { // md breakpoint
-                    filterSidebar.classList.remove("hidden");
+            // Ensure sidebar is visible on desktop and hidden on mobile resize
+            $(window).resize(function () {
+                if ($(window).width() >= 768) { // md breakpoint
+                    $("#filter-sidebar").removeClass("hidden");
                 } else {
-                    filterSidebar.classList.add("hidden");
+                    $("#filter-sidebar").addClass("hidden");
                 }
             });
-            const checkboxes = document.querySelectorAll(".category-checkbox");
-            const minPriceInput = document.getElementById("min-price");
-            const maxPriceInput = document.getElementById("max-price");
-            const applyFiltersButton = document.getElementById("apply-filters");
 
-            // Function to get URL query parameters
-            function getQueryParam(param) {
-                let urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(param);
-            }
-
-            // Auto-select category if present in URL
-            let selectedCategorySlug = getQueryParam("category");
+            // Auto-select category from URL query params
+            let urlParams = new URLSearchParams(window.location.search);
+            let selectedCategorySlug = urlParams.get("category");
 
             if (selectedCategorySlug) {
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.dataset.slug === selectedCategorySlug) {
-                        checkbox.checked = true;
+                $(".category-checkbox").each(function () {
+                    if ($(this).data("slug") === selectedCategorySlug) {
+                        $(this).prop("checked", true);
                     }
                 });
             }
 
+            // Function to fetch filtered products via AJAX
             function fetchFilteredProducts() {
-                let selectedCategories = [];
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        selectedCategories.push(checkbox.dataset.slug);
-                    }
+                let selectedCategories = $(".category-checkbox:checked").map(function () {
+                    return $(this).data("slug");
+                }).get();
+
+                let minPrice = $("#min-price").val() || 0;
+                let maxPrice = $("#max-price").val() || 10000;
+
+                $.get(`/shop/filter`, {
+                    categories: selectedCategories.join(','),
+                    min_price: minPrice,
+                    max_price: maxPrice
+                }, function (data) {
+                    $("#productContainer").html(data);
                 });
-
-                let minPrice = minPriceInput.value || 0;
-                let maxPrice = maxPriceInput.value || 10000;
-
-                fetch(
-                        `/shop/filter?categories=${selectedCategories.join(',')}&min_price=${minPrice}&max_price=${maxPrice}`
-                    )
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById("productContainer").innerHTML = data;
-                    });
             }
 
-            // Apply filtering on page load if category was selected
+            // Auto-apply filters if category was pre-selected
             if (selectedCategorySlug) {
                 fetchFilteredProducts();
             }
 
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener("change", fetchFilteredProducts);
-            });
-
-            applyFiltersButton.addEventListener("click", fetchFilteredProducts);
+            // Event listeners for filtering
+            $(".category-checkbox").change(fetchFilteredProducts);
+            $("#apply-filters").click(fetchFilteredProducts);
         });
     </script>
 @endsection

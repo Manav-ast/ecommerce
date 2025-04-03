@@ -5,10 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - E-Commerce</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery and jQuery Validation -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
+
+    <style>
+        /* Custom error styling */
+        .error {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen"> <!-- Centered Layout -->
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
     <div class="w-full max-w-md bg-white shadow-md border-t-4 border-blue-500 px-6 py-6 rounded-lg">
         <!-- Logo -->
@@ -41,20 +55,20 @@
             </div>
         @endif
 
-        <form method="post" action="{{ route('user.authenticate') }}" autocomplete="off">
+        <form id="loginForm" method="post" action="{{ route('user.authenticate') }}" autocomplete="off">
             @csrf
             <div class="space-y-3">
                 <div>
                     <label for="email" class="text-gray-600 block mb-1">Email Address</label>
                     <input type="email" name="email" id="email"
                         class="w-full border border-gray-300 px-3 py-2.5 rounded-md text-gray-700 text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 placeholder-gray-400"
-                        placeholder="youremail@domain.com" value="manav@gmail.com">
+                        placeholder="youremail@domain.com">
                 </div>
                 <div>
                     <label for="password" class="text-gray-600 block mb-1">Password</label>
                     <input type="password" name="password" id="password"
                         class="w-full border border-gray-300 px-3 py-2.5 rounded-md text-gray-700 text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 placeholder-gray-400"
-                        placeholder="*******" value="Test@1234">
+                        placeholder="*******">
                 </div>
 
                 <div class="flex justify-between items-center text-sm mt-1">
@@ -77,6 +91,39 @@
             <a href="{{ route('user.register') }}" class="text-blue-500 font-medium hover:underline">Register now</a>
         </p>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#loginForm").validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    password: {
+                        required: true,
+                        minlength: 6
+                    }
+                },
+                messages: {
+                    email: {
+                        required: "Email is required",
+                        email: "Enter a valid email address"
+                    },
+                    password: {
+                        required: "Password is required",
+                        minlength: "Password must be at least 6 characters"
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    error.insertAfter(element);
+                },
+                submitHandler: function(form) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
 
 </body>
 
