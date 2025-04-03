@@ -42,8 +42,8 @@
                                     class="text-blue-500 hover:text-blue-700 transition">
                                     <i class="uil uil-edit"></i>
                                 </a>
-                                <button type="button" onclick="openDeleteModal({{ $block->id }}, '{{ $block->title }}')"
-                                    class="text-red-500 hover:text-red-700 transition">
+                                <button type="button" class="delete-btn text-red-500 hover:text-red-700 transition"
+                                    data-id="{{ $block->id }}" data-title="{{ $block->title }}">
                                     <i class="uil uil-trash-alt"></i>
                                 </button>
                             </td>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Static Blocks Cards (Mobile) -->
-        <div class="md:hidden mt-6 space-y-4">
+        <div class="md:hidden mt-6 space-y-4" id="mobileStaticBlockContainer">
             @foreach ($staticBlocks as $block)
                 <div id="mobile-row-{{ $block->id }}" class="bg-white rounded-lg shadow-md p-4">
                     <div class="flex justify-between items-start mb-3">
@@ -70,8 +70,8 @@
                             class="text-blue-500 hover:text-blue-700 transition">
                             <i class="uil uil-edit"></i>
                         </a>
-                        <button type="button" onclick="openDeleteModal({{ $block->id }}, '{{ $block->title }}')"
-                            class="text-red-500 hover:text-red-700 transition">
+                        <button type="button" class="delete-btn text-red-500 hover:text-red-700 transition"
+                            data-id="{{ $block->id }}" data-title="{{ $block->title }}">
                             <i class="uil uil-trash-alt"></i>
                         </button>
                     </div>
@@ -85,72 +85,80 @@
         </div>
     </div>
 
-    <!-- SweetAlert2 Delete Confirmation & AJAX Search -->
+    <!-- jQuery and SweetAlert2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function openDeleteModal(blockId, blockTitle) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to delete '" + blockTitle + "'. This cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
+        $(document).ready(function() {
+            // DELETE FUNCTION WITH SWEETALERT
+            $(".delete-btn").on("click", function() {
+                let blockId = $(this).data("id");
+                let blockTitle = $(this).data("title");
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to delete '" + blockTitle + "'. This cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/static-blocks/${blockId}`,
+                            type: "POST",
+                            data: {
+                                _method: "DELETE",
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire('Deleted!', response.message, 'success');
+
+                                // Remove the deleted row from both desktop and mobile views
+                                $("#row-" + blockId).fadeOut(500, function() {
+                                    $(this).remove();
+                                });
+                                $("#mobile-row-" + blockId).fadeOut(500, function() {
+                                    $(this).remove();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Error!', 'An error occurred while deleting.',
+                                    'error');
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // SEARCH FUNCTION WITH DEBOUNCE
+            let searchTimer;
+            $("#searchInput").on("keyup", function() {
+                clearTimeout(searchTimer); // Clear previous timer
+                let query = $(this).val();
+
+                searchTimer = setTimeout(function() {
                     $.ajax({
-                        url: "{{ route('admin.static-blocks.destroy', $block->id) }}",
-                        type: "DELETE",
+                        url: "{{ route('admin.static-blocks.search') }}",
+                        type: "GET",
                         data: {
-                            _token: "{{ csrf_token() }}"
+                            q: query
                         },
                         success: function(response) {
-                            Swal.fire('Deleted!', response.message, 'success');
+                            // Update desktop view
+                            $("#staticBlockTableBody").html(response.html);
 
-                            // Remove the deleted row from both desktop and mobile views
-                            $("#row-" + blockId).fadeOut(500, function() {
-                                $(this).remove();
-                            });
-                            $("#mobile-row-" + blockId).fadeOut(500, function() {
-                                $(this).remove();
-                            });
+                            // Update mobile view
+                            $("#mobileStaticBlockContainer").html(response.mobileHtml);
                         },
                         error: function(xhr) {
-                            Swal.fire('Error!', 'An error occurred while deleting.', 'error');
-                            console.error(xhr.responseText);
+                            console.error("Search error:", xhr.responseText);
                         }
                     });
-                }
+                }, 500); // 500ms debounce delay
             });
-        }
-
-        // AJAX Search Functionality
-        let searchTimer;
-        document.getElementById("searchInput").addEventListener("keyup", function() {
-            clearTimeout(searchTimer); // Clear any existing timer
-
-            searchTimer = setTimeout(() => {
-                let query = this.value;
-
-                fetch("{{ route('admin.static-blocks.search') }}?q=" + encodeURIComponent(query), {
-                        method: "GET",
-                        headers: {
-                            "X-Requested-With": "XMLHttpRequest"
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update desktop view
-                        document.getElementById("staticBlockTableBody").innerHTML = data.html;
-
-                        // Update mobile view
-                        const mobileContainer = document.querySelector('.md\\:hidden.mt-6.space-y-4');
-                        if (mobileContainer) {
-                            mobileContainer.innerHTML = data.mobileHtml;
-                        }
-                    })
-                    .catch(error => console.error("Fetch error:", error));
-            }, 500); // 500ms debounce delay
         });
     </script>
 @endsection

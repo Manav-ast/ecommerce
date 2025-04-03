@@ -5,7 +5,7 @@
         <!-- Page Title -->
         <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">Create Role</h2>
 
-        <form action="{{ route('admin.roles.store') }}" method="POST" class="max-w-2xl mx-auto">
+        <form id="roleForm" action="{{ route('admin.roles.store') }}" method="POST" class="max-w-2xl mx-auto">
             @csrf
             <div class="bg-white rounded-lg shadow-md p-6">
                 <!-- Role Name Input -->
@@ -59,3 +59,40 @@
         </form>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $("#roleForm").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 3
+                    },
+                    "permissions[]": {
+                        required: true,
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Role name is required.",
+                        minlength: "Role name must be at least 3 characters long."
+                    },
+                    "permissions[]": {
+                        required: "Please select at least one permission."
+                    }
+                },
+                errorElement: "p",
+                errorPlacement: function(error, element) {
+                    error.addClass("mt-1 text-sm text-red-500");
+                    element.closest("div").append(error);
+                },
+                highlight: function(element) {
+                    $(element).addClass("border-red-500").removeClass("border-gray-300");
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass("border-red-500").addClass("border-gray-300");
+                }
+            });
+        });
+    </script>
+@endpush

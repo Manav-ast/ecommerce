@@ -90,11 +90,17 @@
                     @enderror
                 </div>
 
-                <!-- Submit Button -->
-                <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                    Update Administrator
-                </button>
+                <!-- Buttons Group -->
+                <div class="flex justify-between space-x-3 pt-2">
+                    <a href="{{ route('admin.admins.index') }}" 
+                       class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition flex items-center justify-center">
+                        </i> Cancel
+                    </a>
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center">
+                        </i> Update Administrator
+                    </button>
+                </div>
             </form>
         </div>
     </div>

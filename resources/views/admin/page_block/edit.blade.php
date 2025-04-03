@@ -60,7 +60,6 @@
 
 <!-- JavaScript for Slug & Validation -->
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
     <script>
         $(document).ready(function() {
             // Initialize Summernote
@@ -121,8 +120,4 @@
             });
         });
     </script>
-@endpush
-
-@push('styles')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
 @endpush

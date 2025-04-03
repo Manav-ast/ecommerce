@@ -42,7 +42,8 @@
                     <select name="status" id="status" required
                         class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="active" {{ $staticBlock->status == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ $staticBlock->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        <option value="inactive" {{ $staticBlock->status == 'inactive' ? 'selected' : '' }}>Inactive
+                        </option>
                     </select>
                     <span class="text-red-500 text-sm hidden" id="error-status"></span>
                 </div>
@@ -59,7 +60,6 @@
 
 <!-- JavaScript for Slug & Validation -->
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
     <script>
         $(document).ready(function() {
             // Initialize Summernote
@@ -120,8 +120,4 @@
             });
         });
     </script>
-@endpush
-
-@push('styles')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
 @endpush

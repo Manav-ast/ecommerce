@@ -5,7 +5,7 @@
         <!-- Page Title -->
         <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800">Edit Role</h2>
 
-        <form action="{{ route('admin.roles.update', $role->id) }}" method="POST" class="max-w-2xl mx-auto">
+        <form id="editRoleForm" action="{{ route('admin.roles.update', $role->id) }}" method="POST" class="max-w-2xl mx-auto">
             @csrf
             @method('PUT')
             <div class="bg-white rounded-lg shadow-md p-6">
@@ -59,36 +59,45 @@
             </div>
         </form>
     </div>
-@endsection
 
-<!-- Include jQuery and jQuery Validation Plugin -->
-@push('scripts')
+    <!-- Include jQuery and jQuery Validation Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script>
         $(document).ready(function() {
             $("#editRoleForm").validate({
                 rules: {
-                    role_name: {
+                    name: {
                         required: true,
                         minlength: 3,
                         maxlength: 50
                     },
-                    description: {
-                        maxlength: 255
+                    "permissions[]": {
+                        required: true
                     }
                 },
                 messages: {
-                    role_name: {
-                        required: "Please enter a role name",
-                        minlength: "Role name must be at least 3 characters long",
-                        maxlength: "Role name cannot exceed 50 characters"
+                    name: {
+                        required: "Role name is required.",
+                        minlength: "Role name must be at least 3 characters long.",
+                        maxlength: "Role name cannot exceed 50 characters."
                     },
-                    description: {
-                        maxlength: "Description cannot exceed 255 characters"
+                    "permissions[]": {
+                        required: "Please select at least one permission."
                     }
                 },
-                errorElement: "span",
-                errorClass: "text-red-500 text-sm"
+                errorElement: "p",
+                errorPlacement: function(error, element) {
+                    error.addClass("mt-1 text-sm text-red-500");
+                    element.closest("div").append(error);
+                },
+                highlight: function(element) {
+                    $(element).addClass("border-red-500").removeClass("border-gray-300");
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass("border-red-500").addClass("border-gray-300");
+                }
             });
         });
     </script>
-@endpush
+@endsection

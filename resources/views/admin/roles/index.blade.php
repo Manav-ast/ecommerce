@@ -97,30 +97,26 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Create form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url('/admin/roles') }}/" + roleId;
+                    let form = $('<form>', {
+                        method: 'POST',
+                        action: "{{ url('/admin/roles') }}/" + roleId
+                    });
 
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_token',
+                        value: '{{ csrf_token() }}'
+                    }));
 
-                    // Add method field
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_method',
+                        value: 'DELETE'
+                    }));
 
-                    // Append form to body and submit
-                    document.body.appendChild(form);
+                    $('body').append(form);
                     form.submit();
 
-                    // Show success message after deletion
                     Swal.fire(
                         'Deleted!',
                         roleName + ' has been deleted.',
@@ -132,29 +128,28 @@
 
         // AJAX Search Functionality
         let searchTimer;
-        document.getElementById("searchInput").addEventListener("keyup", function() {
-            clearTimeout(searchTimer); // Clear any existing timer
+        $("#searchInput").on("keyup", function() {
+            clearTimeout(searchTimer);
 
             searchTimer = setTimeout(() => {
-                let query = this.value.trim(); // Remove leading/trailing spaces
+                let query = $(this).val().trim();
 
-                fetch("{{ route('admin.roles.search') }}?q=" + encodeURIComponent(query), {
-                        method: "GET",
-                        headers: {
-                            "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
-                        }
-                    })
-                    .then(response => response.json()) // Expect JSON response
-                    .then(data => {
-                        // Update both desktop and mobile views
-                        const desktopTableBody = document.getElementById("roleTableBody");
-                        const mobileView = document.getElementById("roleMobileCards");
-
-                        if (desktopTableBody) desktopTableBody.innerHTML = data.html;
-                        if (mobileView) mobileView.innerHTML = data.mobileHtml;
-                    })
-                    .catch(error => console.error("Fetch error:", error));
-            }, 500); // 500ms debounce delay
+                $.ajax({
+                    url: "{{ route('admin.roles.search') }}",
+                    method: "GET",
+                    data: {
+                        q: query
+                    },
+                    dataType: "json",
+                    success: function(data) {
+                        $("#roleTableBody").html(data.html);
+                        $("#roleMobileCards").html(data.mobileHtml);
+                    },
+                    error: function(error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
+            }, 500);
         });
     </script>
 @endsection

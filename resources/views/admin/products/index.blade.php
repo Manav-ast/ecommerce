@@ -96,53 +96,53 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Create form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url('/admin/products') }}/" + productId;
+                    let form = $('<form>', {
+                        method: 'POST',
+                        action: "{{ url('/admin/products') }}/" + productId
+                    });
 
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_token',
+                        value: '{{ csrf_token() }}'
+                    }));
 
-                    // Add method field
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_method',
+                        value: 'DELETE'
+                    }));
 
-                    // Append form to body and submit
-                    document.body.appendChild(form);
+                    $('body').append(form);
                     form.submit();
                 }
             });
         }
 
-        // AJAX Search Functionality
+        // jQuery AJAX Search Functionality
         let searchTimer;
-        document.getElementById("searchInput").addEventListener("keyup", function() {
+        $("#searchInput").on("keyup", function() {
             clearTimeout(searchTimer); // Clear any existing timer
 
             searchTimer = setTimeout(() => {
+                let query = $(this).val();
 
-                let query = this.value;
-
-                fetch("{{ route('admin.products.search') }}?q=" + encodeURIComponent(query), {
-                        method: "GET",
-                        headers: {
-                            "X-Requested-With": "XMLHttpRequest" // Tell Laravel it's an AJAX request
-                        }
-                    })
-                    .then(response => response.json()) // Expect JSON response
-                    .then(data => {
-                        document.getElementById("productTableBody").innerHTML = data
-                            .html; // Inject HTML response
-                    })
-                    .catch(error => console.error("Fetch error:", error));
+                $.ajax({
+                    url: "{{ route('admin.products.search') }}",
+                    type: "GET",
+                    data: {
+                        q: query
+                    },
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    success: function(data) {
+                        $("#productTableBody").html(data.html);
+                    },
+                    error: function(xhr) {
+                        console.error("AJAX error:", xhr.responseText);
+                    }
+                });
             }, 500); // 500ms debounce delay
         });
     </script>

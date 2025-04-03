@@ -47,9 +47,8 @@
                                         class="text-blue-500 hover:text-blue-700 transition">
                                         <i class="uil uil-edit"></i>
                                     </a>
-                                    <button type="button"
-                                        onclick="openDeleteModal({{ $admin->id }}, '{{ $admin->name }}')"
-                                        class="text-red-500 hover:text-red-700 transition">
+                                    <button type="button" class="delete-admin text-red-500 hover:text-red-700 transition"
+                                        data-id="{{ $admin->id }}" data-name="{{ $admin->name }}">
                                         <i class="uil uil-trash-alt"></i>
                                     </button>
                                 </td>
@@ -81,9 +80,8 @@
                                     class="text-blue-500 hover:text-blue-700 transition">
                                     <i class="uil uil-edit"></i>
                                 </a>
-                                <button type="button"
-                                    onclick="openDeleteModal({{ $admin->id }}, '{{ $admin->name }}')"
-                                    class="text-red-500 hover:text-red-700 transition">
+                                <button type="button" class="delete-admin text-red-500 hover:text-red-700 transition"
+                                    data-id="{{ $admin->id }}" data-name="{{ $admin->name }}">
                                     <i class="uil uil-trash-alt"></i>
                                 </button>
                             </div>
@@ -100,83 +98,87 @@
 
     <!-- SweetAlert2 is loaded in the dashboard layout -->
 
-    <!-- JavaScript for Delete Confirmation Modal & AJAX Search -->
+    <!-- jQuery Script for Delete Confirmation Modal & AJAX Search -->
     <script>
-        function openDeleteModal(adminId, adminName) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to delete '" + adminName + "'. This cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Create form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url('/admin/admins') }}/" + adminId;
+        $(document).ready(function() {
+            // Delete confirmation with jQuery
+            $(document).on('click', '.delete-admin', function() {
+                const adminId = $(this).data('id');
+                const adminName = $(this).data('name');
 
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to delete '" + adminName + "'. This cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Create and submit form with jQuery
+                        const form = $('<form>', {
+                            method: 'POST',
+                            action: "{{ url('/admin/admins') }}/" + adminId
+                        });
 
-                    // Add method field
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
+                        // Add CSRF token
+                        form.append($('<input>', {
+                            type: 'hidden',
+                            name: '_token',
+                            value: '{{ csrf_token() }}'
+                        }));
 
-                    // Append form to body and submit
-                    document.body.appendChild(form);
-                    form.submit();
+                        // Add method field
+                        form.append($('<input>', {
+                            type: 'hidden',
+                            name: '_method',
+                            value: 'DELETE'
+                        }));
 
-                    // Show success message after deletion
-                    Swal.fire(
-                        'Deleted!',
-                        adminName + ' has been deleted.',
-                        'success'
-                    );
-                }
+                        // Append to body and submit
+                        $('body').append(form);
+                        form.submit();
+
+                        // Show success message
+                        Swal.fire(
+                            'Deleted!',
+                            adminName + ' has been deleted.',
+                            'success'
+                        );
+                    }
+                });
             });
-        }
 
-        // AJAX Search Functionality with Debounce
-        let searchTimer;
-        document.getElementById("searchInput").addEventListener("keyup", function() {
-            clearTimeout(searchTimer);
+            // AJAX Search with jQuery debounce
+            let searchTimer;
 
-            searchTimer = setTimeout(() => {
-                let query = this.value.trim();
+            $('#searchInput').keyup(function() {
+                clearTimeout(searchTimer);
 
-                fetch("{{ route('admin.admins.search') }}?q=" + encodeURIComponent(query), {
+                searchTimer = setTimeout(() => {
+                    const query = $(this).val().trim();
+
+                    $.ajax({
+                        url: "{{ route('admin.admins.search') }}",
                         method: "GET",
-                        headers: {
-                            "X-Requested-With": "XMLHttpRequest"
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update desktop view
-                        const desktopTableBody = document.querySelector(
-                            '.hidden.md\\:block #adminTableBody');
-                        if (desktopTableBody) {
-                            desktopTableBody.innerHTML = data.html;
-                        }
+                        data: {
+                            q: query
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            // Update desktop view
+                            $('.hidden.md\\:block #adminTableBody').html(data.html);
 
-                        // Update mobile view
-                        const mobileTableBody = document.querySelector('.md\\:hidden #adminTableBody');
-                        if (mobileTableBody) {
-                            mobileTableBody.innerHTML = data.mobileHtml;
+                            // Update mobile view
+                            $('.md\\:hidden #adminTableBody').html(data.mobileHtml);
+                        },
+                        error: function(error) {
+                            console.error("AJAX error:", error);
                         }
-                    })
-                    .catch(error => console.error("Fetch error:", error));
-            }, 500);
+                    });
+                }, 500);
+            });
         });
     </script>
 @endsection

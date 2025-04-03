@@ -31,7 +31,7 @@
                     </thead>
                     <tbody id="userTableBody">
                         @foreach ($users as $user)
-                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                            <tr id="row-{{ $user->id }}" class="border-b border-gray-200 hover:bg-gray-50 transition">
                                 <td class="px-6 py-3 text-gray-800">{{ $user->id }}</td>
                                 <td class="px-6 py-3 text-gray-800">{{ $user->name }}</td>
                                 <td class="px-6 py-3 text-gray-600">{{ $user->email }}</td>
@@ -47,9 +47,8 @@
                                         class="text-blue-500 hover:text-blue-700 transition">
                                         <i class="uil uil-edit"></i>
                                     </a>
-                                    <button type="button"
-                                        onclick="openDeleteModal({{ $user->id }}, '{{ $user->name }}')"
-                                        class="text-red-500 hover:text-red-700 transition">
+                                    <button type="button" class="text-red-500 hover:text-red-700 transition delete-btn"
+                                        data-id="{{ $user->id }}" data-name="{{ $user->name }}">
                                         <i class="uil uil-trash-alt"></i>
                                     </button>
                                 </td>
@@ -61,9 +60,10 @@
 
             <!-- Mobile View -->
             <div class="md:hidden">
-                <div id="userTableBody" class="space-y-4 p-4">
+                <div id="mobileUserTableBody" class="space-y-4 p-4">
                     @foreach ($users as $user)
-                        <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <div id="mobile-row-{{ $user->id }}"
+                            class="bg-white rounded-lg shadow p-4 border border-gray-200">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <h3 class="font-semibold text-gray-800">#{{ $user->id }} - {{ $user->name }}
@@ -81,9 +81,8 @@
                                     class="text-blue-500 hover:text-blue-700 transition">
                                     <i class="uil uil-edit"></i>
                                 </a>
-                                <button type="button"
-                                    onclick="openDeleteModal({{ $user->id }}, '{{ $user->name }}')"
-                                    class="text-red-500 hover:text-red-700 transition">
+                                <button type="button" class="text-red-500 hover:text-red-700 transition delete-btn"
+                                    data-id="{{ $user->id }}" data-name="{{ $user->name }}">
                                     <i class="uil uil-trash-alt"></i>
                                 </button>
                             </div>
@@ -97,87 +96,80 @@
             {{ $users->links() }}
         </div>
     </div>
-
-    <!-- SweetAlert2 is loaded in the dashboard layout -->
-
-    <!-- JavaScript for Delete Confirmation Modal & AJAX Search -->
+@endsection
+@push('scripts')
     <script>
-        function openDeleteModal(userId, userName) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to delete '" + userName + "'. This cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Create form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url('/admin/users') }}/" + userId;
+        $(document).ready(function() {
+            // Delete user confirmation
+            $(".delete-btn").click(function() {
+                let userId = $(this).data("id");
+                let userName = $(this).data("name");
 
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You are about to delete '" + userName + "'. This cannot be undone!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ url('/admin/users') }}/" + userId,
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                _method: "DELETE"
+                            },
+                            success: function(response) {
+                                Swal.fire("Deleted!", response.message, "success");
 
-                    // Add method field
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
-
-                    // Append form to body and submit
-                    document.body.appendChild(form);
-                    form.submit();
-
-                    // Show success message after deletion
-                    Swal.fire(
-                        'Deleted!',
-                        userName + ' has been deleted.',
-                        'success'
-                    );
-                }
+                                // Remove user from both desktop and mobile views
+                                $("#row-" + userId).fadeOut(500, function() {
+                                    $(this).remove();
+                                });
+                                $("#mobile-row-" + userId).fadeOut(500, function() {
+                                    $(this).remove();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire("Error!", "An error occurred while deleting.",
+                                    "error");
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
             });
-        }
 
-        // AJAX Search Functionality with Debounce
-        let searchTimer;
-        document.getElementById("searchInput").addEventListener("keyup", function() {
-            clearTimeout(searchTimer); // Clear any existing timer
+            // AJAX Search with Debounce
+            let searchTimer;
+            $("#searchInput").on("keyup", function() {
+                clearTimeout(searchTimer);
 
-            // Set a new timer to delay the search execution
-            searchTimer = setTimeout(() => {
-                let query = this.value.trim(); // Remove leading/trailing spaces
+                searchTimer = setTimeout(() => {
+                    let query = $(this).val().trim();
 
-                fetch("{{ route('admin.users.search') }}?q=" + encodeURIComponent(query), {
-                        method: "GET",
-                        headers: {
-                            "X-Requested-With": "XMLHttpRequest" // Ensure Laravel detects AJAX
+                    $.ajax({
+                        url: "{{ route('admin.users.search') }}",
+                        type: "GET",
+                        data: {
+                            q: query
+                        },
+                        success: function(data) {
+                            // Update desktop table
+                            $("#userTableBody").html(data.html);
+
+                            // Update mobile view
+                            $("#mobileUserTableBody").html(data.mobileHtml);
+                        },
+                        error: function(xhr) {
+                            console.error("Search error:", xhr.responseText);
                         }
-                    })
-                    .then(response => response.json()) // Expect JSON response
-                    .then(data => {
-                        // Update desktop view
-                        const desktopTableBody = document.querySelector(
-                            '.hidden.md\\:block #userTableBody');
-                        if (desktopTableBody) {
-                            desktopTableBody.innerHTML = data.html;
-                        }
-
-                        // Update mobile view
-                        const mobileTableBody = document.querySelector('.md\\:hidden #userTableBody');
-                        if (mobileTableBody) {
-                            mobileTableBody.innerHTML = data.mobileHtml;
-                        }
-                    })
-                    .catch(error => console.error("Fetch error:", error));
-            }, 500); // 500ms debounce delay
+                    });
+                }, 500); // 500ms debounce delay
+            });
         });
     </script>
-@endsection
+@endpush

@@ -131,31 +131,36 @@
             });
         }
 
-        // AJAX Search Functionality
+        // jQuery AJAX Search Functionality
         let searchTimer;
-        document.getElementById("searchInput").addEventListener("keyup", function() {
+        $("#searchInput").on("keyup", function() {
             clearTimeout(searchTimer); // Clear any existing timer
 
             searchTimer = setTimeout(() => {
-                let query = this.value;
+                let query = $(this).val();
 
-                fetch("{{ route('admin.page-blocks.search') }}?q=" + encodeURIComponent(query), {
-                        method: "GET",
-                        headers: {
-                            "X-Requested-With": "XMLHttpRequest"
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
+                $.ajax({
+                    url: "{{ route('admin.page-blocks.search') }}",
+                    type: "GET",
+                    data: {
+                        q: query
+                    },
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    success: function(data) {
                         // Update desktop view
-                        document.getElementById("staticBlockTableBody").innerHTML = data.html;
+                        $("#staticBlockTableBody").html(data.html);
                         // Update mobile view
-                        let mobileContainer = document.querySelector('.md\\:hidden.mt-6.space-y-4');
-                        if (mobileContainer) {
-                            mobileContainer.innerHTML = data.mobileHtml || '';
+                        let mobileContainer = $(".md\\:hidden.mt-6.space-y-4");
+                        if (mobileContainer.length) {
+                            mobileContainer.html(data.mobileHtml || '');
                         }
-                    })
-                    .catch(error => console.error("Fetch error:", error));
+                    },
+                    error: function(xhr) {
+                        console.error("Fetch error:", xhr.responseText);
+                    }
+                });
             }, 500); // 500ms debounce delay
         });
     </script>

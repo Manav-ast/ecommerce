@@ -95,20 +95,18 @@
                 confirmButtonText: 'Yes, restore it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Create form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url('/admin/products') }}/" + productId + "/restore";
+                    let form = $('<form>', {
+                        method: 'POST',
+                        action: "{{ url('/admin/products') }}/" + productId + "/restore"
+                    });
 
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_token',
+                        value: '{{ csrf_token() }}'
+                    }));
 
-                    // Append form to body and submit
-                    document.body.appendChild(form);
+                    $('body').append(form);
                     form.submit();
                 }
             });
@@ -125,30 +123,28 @@
                 confirmButtonText: 'Yes, delete permanently!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Create form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ url('/admin/products') }}/" + productId + "/force-delete";
+                    let form = $('<form>', {
+                        method: 'POST',
+                        action: "{{ url('/admin/products') }}/" + productId + "/force-delete"
+                    });
 
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_token',
+                        value: '{{ csrf_token() }}'
+                    }));
 
-                    // Add method field
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_method',
+                        value: 'DELETE'
+                    }));
 
-                    // Append form to body and submit
-                    document.body.appendChild(form);
+                    $('body').append(form);
                     form.submit();
                 }
             });
         }
     </script>
+
 @endsection
