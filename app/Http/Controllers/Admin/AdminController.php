@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Admin\AdminRequest;
 
 class AdminController extends Controller
 {
@@ -25,16 +26,9 @@ class AdminController extends Controller
         return view('admin.admins.create', compact('roles'));
     }
 
-    public function store(Request $request)
+    public function store(AdminRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email',
-            'password' => 'required|min:8',
-            'role_id' => 'nullable|exists:roles,id',
-            'phone_number' => 'nullable|string|max:20',
-            'status' => 'required|in:active,inactive'
-        ]);
+        $validated = $request->validated();
 
         $validated['password'] = bcrypt($validated['password']);
         Admin::create($validated);
@@ -49,16 +43,9 @@ class AdminController extends Controller
         return view('admin.admins.edit', compact('admin', 'roles'));
     }
 
-    public function update(Request $request, Admin $admin)
+    public function update(AdminRequest $request, Admin $admin)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email,' . $admin->id,
-            'password' => 'nullable|min:8',
-            'role_id' => 'nullable|exists:roles,id',
-            'phone_number' => 'nullable|string|max:20',
-            'status' => 'required|in:active,inactive'
-        ]);
+        $validated = $request->validated();
 
         if (isset($validated['password'])) {
             $validated['password'] = bcrypt($validated['password']);

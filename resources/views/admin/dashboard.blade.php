@@ -89,29 +89,12 @@
     <script src="{{ asset('js/sweetalert.js') }}"></script>
 
     <!-- Flash Messages for SweetAlert2 -->
-    @if (session('success'))
-        <script>
-            var successMessage = "{{ session('success') }}";
-        </script>
-    @endif
-
-    @if (session('error'))
-        <script>
-            var errorMessage = "{{ session('error') }}";
-        </script>
-    @endif
-
-    @if (session('warning'))
-        <script>
-            var warningMessage = "{{ session('warning') }}";
-        </script>
-    @endif
-
-    @if (session('info'))
-        <script>
-            var infoMessage = "{{ session('info') }}";
-        </script>
-    @endif
+    <script>
+        var successMessage = @json(session('success'));
+        var errorMessage = @json(session('error'));
+        var warningMessage = @json(session('warning'));
+        var infoMessage = @json(session('info'));
+    </script>
 
     <!-- Load stacked scripts first, then initialize flash messages -->
     @stack('scripts')
