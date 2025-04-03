@@ -131,28 +131,46 @@
     <script>
         // AJAX Search Functionality
         $(document).ready(function() {
+            // Search functionality
             let searchTimer;
+
             $("#searchInput").on("keyup", function() {
-                clearTimeout(searchTimer); // Clear any existing timer
+                clearTimeout(searchTimer);
 
-                searchTimer = setTimeout(() => {
-                    let query = $(this).val().trim(); // Remove extra spaces
+                const searchBox = $(this);
+                const query = searchBox.val().trim();
 
-                    $.ajax({
-                        url: "{{ route('admin.orders.search') }}",
-                        type: "GET",
-                        data: {
-                            q: query
-                        },
-                        dataType: "json",
-                        success: function(data) {
-                            $("#orderTableBody").html(data.html);
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Search Error:", error);
-                        }
-                    });
-                }, 500); // 500ms debounce delay
+                // Only search if query is not empty
+                if (query.length > 0) {
+                    searchTimer = setTimeout(function() {
+                        // Use fetch API for search
+                        fetch('{{ url('/admin/orders/search') }}?q=' + encodeURIComponent(query), {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data && data.html) {
+                                    // Update the table body with the returned HTML
+                                    $("#orderTableBody").html(data.html);
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Search error:", error);
+                            });
+                    }, 500);
+                } else {
+                    // If search is cleared, reload original page
+                    window.location.reload();
+                }
             });
         });
 

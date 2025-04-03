@@ -72,15 +72,16 @@ Route::prefix("admin")->group(function () {
         //Admin orders routes
         Route::group(['middleware' => 'can:manage_orders'], function () {
             Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders');
+            Route::get('/orders/search', [AdminOrderController::class, 'search'])->name('admin.orders.search');
             Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('admin.orders.create');
             Route::post('/orders/store', [AdminOrderController::class, 'store'])->name('admin.orders.store');
             Route::get('/orders/edit/{id}', [AdminOrderController::class, 'edit'])->name('admin.orders.edit');
             Route::put('/orders/update/{id}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
-            Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
             Route::get('/orders/details/{id}', [AdminOrderController::class, 'details'])->name('admin.orders.details');
             Route::put('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.update-status');
-            Route::get('/orders/search', [AdminOrderController::class, 'search'])->name('admin.orders.search');
             Route::post('/orders/update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+            // This wildcard route should be last to avoid conflicts
+            Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
         });
 
         //Admin users routes
