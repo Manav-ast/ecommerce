@@ -22,40 +22,49 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Define gates for admin permissions
-        Gate::define('manage_categories', function ($admin) {
-            return $admin->hasPermission('manage_categories');
-        });
 
-        Gate::define('manage_products', function ($admin) {
-            return $admin->hasPermission('manage_products');
-        });
-
-        Gate::define('manage_orders', function ($admin) {
-            return $admin->hasPermission('manage_orders');
-        });
-
-        Gate::define('manage_users', function ($admin) {
-            return $admin->hasPermission('manage_users');
-        });
-
-        Gate::define('manage_roles', function ($admin) {
-            return $admin->hasPermission('manage_roles');
-        });
-
-        Gate::define('manage_static_blocks', function ($admin) {
-            return $admin->hasPermission('manage_static_blocks');
-        });
-
-        Gate::define('manage_page_blocks', function ($admin) {
-            return $admin->hasPermission('manage_page_blocks');
-        });
-
-        // Super admin has all permissions
         Gate::before(function ($admin, $permission) {
+            // dd($user, $ability);
             if ($admin->isSuperAdmin()) {
                 return true;
             }
-            return null;
+
+            return $admin->hasPermission($permission);
         });
+        // Gate::define('manage_categories', function ($admin) {
+        //     return $admin->hasPermission('manage_categories');
+        // });
+
+        // Gate::define('manage_products', function ($admin) {
+        //     return $admin->hasPermission('manage_products');
+        // });
+
+        // Gate::define('manage_orders', function ($admin) {
+        //     return $admin->hasPermission('manage_orders');
+        // });
+
+        // Gate::define('manage_users', function ($admin) {
+        //     return $admin->hasPermission('manage_users');
+        // });
+
+        // Gate::define('manage_roles', function ($admin) {
+        //     return $admin->hasPermission('manage_roles');
+        // });
+
+        // Gate::define('manage_static_blocks', function ($admin) {
+        //     return $admin->hasPermission('manage_static_blocks');
+        // });
+
+        // Gate::define('manage_page_blocks', function ($admin) {
+        //     return $admin->hasPermission('manage_page_blocks');
+        // });
+
+        // // Super admin has all permissions
+        // Gate::before(function ($admin, $permission) {
+        //     if ($admin->isSuperAdmin()) {
+        //         return true;
+        //     }
+        //     return null;
+        // });
     }
 }
